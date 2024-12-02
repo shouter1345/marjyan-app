@@ -4,6 +4,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         .container {
             max-width: 1200px;
@@ -133,6 +134,16 @@
         }
         .player-stats.active {
             display: block;
+        }
+        @media (max-width: 768px) {
+            .stats-grid{
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
