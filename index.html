@@ -53,9 +53,17 @@
         #next-button:disabled {
             background: #ccc;
         }
-        .graph-container {
+        /* .graph-container {
             margin-top: 30px;
             padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        } */
+
+        .graph-container {
+            margin: 2rem 0;
+            padding: 1rem;
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -135,6 +143,13 @@
         .player-stats.active {
             display: block;
         }
+
+        #rank-graph {
+            width: 100%;
+            height: 60vh;
+            min-height: 300px;
+            max-height: 400px;
+        }
         @media (max-width: 768px) {
             .stats-grid{
                 grid-template-columns: repeat(2, 1fr);
@@ -143,6 +158,11 @@
         @media (max-width: 480px) {
             .stats-grid {
                 grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .graph-container {
+                padding: 0.5rem;
             }
         }
     </style>
@@ -841,6 +861,14 @@ function updateChart() {
     
     rankChart.update();
 }
+
+const MobileGraph = () => {
+
+}
+ReactDOM.render(
+    React.createElement(MobileGraph),
+    document.getElementById('rank-graph')
+);
 
     </script>
 </body>
