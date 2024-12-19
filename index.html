@@ -4,7 +4,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
     <style>
         .container {
             max-width: 1200px;
@@ -53,17 +53,9 @@
         #next-button:disabled {
             background: #ccc;
         }
-        /* .graph-container {
+        .graph-container {
             margin-top: 30px;
             padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        } */
-
-        .graph-container {
-            margin: 2rem 0;
-            padding: 1rem;
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -143,31 +135,82 @@
         .player-stats.active {
             display: block;
         }
+        .player-name-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        }
 
-        #rank-graph {
-            width: 100%;
-            height: 60vh;
-            min-height: 300px;
-            max-height: 400px;
+        .player-name {
+        font-size: 16px;
+        padding: 4px 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        min-width: 100px;
         }
-        @media (max-width: 768px) {
-            .stats-grid{
-                grid-template-columns: repeat(2, 1fr);
-            }
+
+        .player-name:hover {
+        border-color: #666;
         }
-        @media (max-width: 480px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
+
+        .player-name:focus {
+        outline: none;
+        border-color: #0066cc;
+        box-shadow: 0 0 3px rgba(0, 102, 204, 0.5);
         }
-        @media (max-width: 768px) {
-            .graph-container {
-                padding: 0.5rem;
-            }
+
+        .player-row {
+        display: flex;
+        align-items: center;
+        margin: 10px 0;
         }
+
+        .stats-container {
+        margin-top: 20px;
+        }
+
+        .player-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        }
+
+        .player-tab {
+        padding: 8px 16px;
+        border: none;
+        background: #f0f0f0;
+        cursor: pointer;
+        border-radius: 4px;
+        }
+
+        .player-tab.active {
+        background: #0066cc;
+        color: white;
+        }
+
     </style>
 </head>
 <body>
+
+    <div class="setup-section">
+        <div class="player-name-container">
+          <label>プレイヤー1:</label>
+          <input type="text" class="player-name" id="player1-name" data-player-id="you" value="You" placeholder="名前を入力">
+        </div>
+        <div class="player-name-container">
+          <label>プレイヤー2:</label>
+          <input type="text" class="player-name" id="player2-name" data-player-id="takeda" value="武田" placeholder="名前を入力">
+        </div>
+        <div class="player-name-container">
+          <label>プレイヤー3:</label>
+          <input type="text" class="player-name" id="player3-name" data-player-id="ishie" value="石江" placeholder="名前を入力">
+        </div>
+        <div class="player-name-container">
+          <label>プレイヤー4:</label>
+          <input type="text" class="player-name" id="player4-name" data-player-id="miura" value="三浦" placeholder="名前を入力">
+        </div>
+      </div>
     <div class="container">
         <!-- ゲーム設定部分 -->
         <div class="setup-section">
@@ -582,6 +625,14 @@ function initializeChart() {
         rankChart.destroy();
     }
 
+    // プレイヤー名を取得
+    const playerNames = {
+        you: document.querySelector('#player1-name')?.value || 'You',
+        takeda: document.querySelector('#player2-name')?.value || '武田',
+        ishie: document.querySelector('#player3-name')?.value || '石江',
+        miura: document.querySelector('#player4-name')?.value || '三浦'
+    };
+
     // テレビ放送風のカラーパレット
     const colors = {
         you: {
@@ -608,7 +659,8 @@ function initializeChart() {
             labels: Array.from({length: totalHanchan}, (_, i) => `第${i + 1}半荘`),
             datasets: [
                 {
-                    label: 'You',
+                    label: playerNames.you,  // 動的な名前を使用
+                    id: 'you',
                     data: [],
                     borderColor: colors.you.main,
                     backgroundColor: colors.you.fill,
@@ -622,7 +674,8 @@ function initializeChart() {
                     fill: true
                 },
                 {
-                    label: '武田',
+                    label: playerNames.takeda,
+                    id: 'takeda',
                     data: [],
                     borderColor: colors.takeda.main,
                     backgroundColor: colors.takeda.fill,
@@ -636,7 +689,8 @@ function initializeChart() {
                     fill: true
                 },
                 {
-                    label: '石江',
+                    label: playerNames.ishie,
+                    id: 'ishie',
                     data: [],
                     borderColor: colors.ishie.main,
                     backgroundColor: colors.ishie.fill,
@@ -650,7 +704,8 @@ function initializeChart() {
                     fill: true
                 },
                 {
-                    label: '三浦',
+                    label: playerNames.miura,
+                    id: 'miura',
                     data: [],
                     borderColor: colors.miura.main,
                     backgroundColor: colors.miura.fill,
@@ -727,7 +782,7 @@ function initializeChart() {
                     borderDash: [6, 6],
                     label: {
                         enabled: true,
-                        content: 'You平均',
+                        content: `${playerNames.you}平均`,
                         position: 'right'
                     }
                 },
@@ -740,7 +795,7 @@ function initializeChart() {
                     borderDash: [6, 6],
                     label: {
                         enabled: true,
-                        content: '武田平均',
+                        content: `${playerNames.takeda}平均`,
                         position: 'right'
                     }
                 },
@@ -753,7 +808,7 @@ function initializeChart() {
                     borderDash: [6, 6],
                     label: {
                         enabled: true,
-                        content: '石江平均',
+                        content: `${playerNames.ishie}平均`,
                         position: 'right'
                     }
                 },
@@ -766,7 +821,7 @@ function initializeChart() {
                     borderDash: [6, 6],
                     label: {
                         enabled: true,
-                        content: '三浦平均',
+                        content: `${playerNames.miura}平均`,
                         position: 'right'
                     }
                 }
@@ -785,28 +840,45 @@ function initializeChart() {
                         pointStyle: 'circle'
                     }
                 },
+                // tooltip: {
+                //     mode: 'index',
+                //     intersect: false,
+                //     backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                //     titleColor: '#000',
+                //     bodyColor: '#000',
+                //     borderColor: '#ddd',
+                //     borderWidth: 1,
+                //     titleFont: {
+                //         size: 16,
+                //         weight: 'bold'
+                //     },
+                //     bodyFont: {
+                //         size: 14
+                //     },
+                //     padding: 12,
+                //     callbacks: {
+                //         label: function(context) {
+                //             return `${context.dataset.label}: ${context.parsed.y}位`;
+                //         }
+                //     }
+                // }
                 tooltip: {
-                    mode: 'index',
-                    intersect: false,
-                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                    titleColor: '#000',
-                    bodyColor: '#000',
-                    borderColor: '#ddd',
-                    borderWidth: 1,
-                    titleFont: {
-                        size: 16,
-                        weight: 'bold'
-                    },
-                    bodyFont: {
-                        size: 14
-                    },
-                    padding: 12,
                     callbacks: {
                         label: function(context) {
-                            return `${context.dataset.label}: ${context.parsed.y}位`;
+                            // 現在のプレイヤー名を取得
+                            const currentNames = {
+                                you: document.querySelector('#player1-name').value || 'You',
+                                takeda: document.querySelector('#player2-name').value || '武田',
+                                ishie: document.querySelector('#player3-name').value || '石江',
+                                miura: document.querySelector('#player4-name').value || '三浦'
+                            };
+                            // データセットのIDを使用して現在の名前を取得
+                            const datasetId = context.dataset.id;
+                            const currentName = currentNames[datasetId];
+                            return `${currentName}: ${context.parsed.y}位`;
                         }
                     }
-                }
+                },
             },
             interaction: {
                 mode: 'nearest',
@@ -815,6 +887,33 @@ function initializeChart() {
             }
         }
     });
+}
+
+// プレイヤー名が変更されたときにグラフを更新する関数
+function updateChartLabels() {
+    if (!rankChart) return;
+
+    const playerNames = {
+        you: document.querySelector('[name="player1"]')?.value || playerNames.you,
+        takeda: document.querySelector('[name="player2"]')?.value || 'プレイヤー2',
+        ishie: document.querySelector('[name="player3"]')?.value || 'プレイヤー3',
+        miura: document.querySelector('[name="player4"]')?.value || 'プレイヤー4'
+    };
+
+    rankChart.data.datasets[0].label = playerNames.you;
+    rankChart.data.datasets[1].label = playerNames.takeda;
+    rankChart.data.datasets[2].label = playerNames.ishie;
+    rankChart.data.datasets[3].label = playerNames.miura;
+
+    // 平均着順の注釈ラベルも更新
+    if (rankChart.options.plugins.annotation?.annotations) {
+        rankChart.options.plugins.annotation.annotations.youAvg.label.content = `${playerNames.you}平均`;
+        rankChart.options.plugins.annotation.annotations.takedaAvg.label.content = `${playerNames.takeda}平均`;
+        rankChart.options.plugins.annotation.annotations.ishieAvg.label.content = `${playerNames.ishie}平均`;
+        rankChart.options.plugins.annotation.annotations.miuraAvg.label.content = `${playerNames.miura}平均`;
+    }
+
+    rankChart.update();
 }
 
 function selectRank(player, rank) {
@@ -862,13 +961,164 @@ function updateChart() {
     rankChart.update();
 }
 
-const MobileGraph = () => {
+// グラフ更新時の処理
+function updateGraphNames() {
+  const playerNames = {
+    player1: document.querySelector('[name="player1"]').value || 'プレイヤー1',
+    player2: document.querySelector('[name="player2"]').value || 'プレイヤー2',
+    player3: document.querySelector('[name="player3"]').value || 'プレイヤー3',
+    player4: document.querySelector('[name="player4"]').value || 'プレイヤー4'
+  };
 
+  // グラフの凡例とデータ系列の名前を更新
+  if (chart && chart.series) {
+    chart.series.forEach((series, index) => {
+      const playerKey = `player${index + 1}`;
+      series.update({
+        name: playerNames[playerKey]
+      }, false);
+    });
+    chart.redraw();
+  }
 }
-ReactDOM.render(
-    React.createElement(MobileGraph),
-    document.getElementById('rank-graph')
-);
+
+function updatePlayerNames() {
+  const players = {
+    player1: document.querySelector('[name="player1"]').value || 'プレイヤー1',
+    player2: document.querySelector('[name="player2"]').value || 'プレイヤー2',
+    player3: document.querySelector('[name="player3"]').value || 'プレイヤー3',
+    player4: document.querySelector('[name="player4"]').value || 'プレイヤー4'
+  };
+
+  // グラフの設定を更新
+  if (chart) {
+    chart.update({
+      series: [{
+        name: players.player1,
+        data: playerData.player1 || []
+      }, {
+        name: players.player2,
+        data: playerData.player2 || []
+      }, {
+        name: players.player3,
+        data: playerData.player3 || []
+      }, {
+        name: players.player4,
+        data: playerData.player4 || []
+      }]
+    });
+  }
+}
+
+// // プレイヤー名の入力フィールドにイベントリスナーを追加
+// document.querySelectorAll('.player-name').forEach(input => {
+//   input.addEventListener('input', function() {
+//       if(rankChart) {
+//           initializeChart();
+//       }
+//     });
+// });
+
+// プレイヤー名の変更を監視
+document.querySelectorAll('.player-name').forEach(input => {
+    input.addEventListener('input', function() {
+        if (rankChart) {
+            // データセットのラベルを更新
+            const playerIndex = {
+                'player1-name': 0,
+                'player2-name': 1,
+                'player3-name': 2,
+                'player4-name': 3
+            }[this.id];
+            
+            if (playerIndex !== undefined) {
+                rankChart.data.datasets[playerIndex].label = this.value;
+                // 平均着順の注釈も更新
+                const annotationKeys = ['youAvg', 'takedaAvg', 'ishieAvg', 'miuraAvg'];
+                const annotationKey = annotationKeys[playerIndex];
+                if (rankChart.options.plugins.annotation.annotations[annotationKey]) {
+                    rankChart.options.plugins.annotation.annotations[annotationKey].label.content = 
+                        `${this.value}平均`;
+                }
+                rankChart.update();
+            }
+        }
+    });
+});
+
+// プレイヤー名の変更を処理する関数
+function updatePlayerName(input) {
+  const newName = input.value;
+  const playerId = input.dataset.playerId;
+
+  // 順位表示の名前を更新
+  const playerRow = document.getElementById(`${playerId}-row`);
+  if (playerRow) {
+    const nameElement = playerRow.firstElementChild;
+    if (nameElement) {
+      nameElement.textContent = newName;
+    }
+  }
+
+  // 統計タブの名前を更新
+  const playerTabs = document.querySelector('.player-tabs');
+  if (playerTabs) {
+    const tabs = Array.from(playerTabs.children);
+    const tabIndex = ['you', 'takeda', 'ishie', 'miura'].indexOf(playerId);
+    if (tabIndex >= 0 && tabs[tabIndex]) {
+      tabs[tabIndex].textContent = newName;
+    }
+  }
+
+  // 統計情報セクションのタイトルを更新
+  const statsSection = document.getElementById(`${playerId}-stats`);
+  if (statsSection) {
+    const titleElement = statsSection.querySelector('.stats-title');
+    if (titleElement) {
+      titleElement.textContent = `${newName}の成績`;
+    }
+  }
+
+  // グラフの凡例を更新（グラフライブラリを使用している場合）
+  if (window.chart) {
+    const series = window.chart.series.find(s => s.name === playerId);
+    if (series) {
+      series.update({ name: newName });
+    }
+  }
+}
+
+// イベントリスナーを設定
+document.querySelectorAll('.player-name').forEach(input => {
+  input.addEventListener('input', function() {
+    updatePlayerName(this);
+  });
+
+// 初期化時にも名前を更新
+updatePlayerName(input);
+});
+
+document.querySelectorAll('.player-name').forEach(input => {
+  input.addEventListener('input', function() {
+    const playerId = this.id.split('-')[0];
+    const playerElements = document.querySelectorAll(`.${playerId}-row, #${playerId}-stats`);
+    
+    // プレイヤー行とタブの名前を更新
+    playerElements.forEach(el => {
+      const nameDisplay = el.querySelector('.player-name-display');
+      if (nameDisplay) {
+        nameDisplay.textContent = this.value;
+      }
+    });
+    
+    // タブの名前を更新
+    const tab = document.querySelector(`[data-player="${playerId}"]`);
+    if (tab) {
+      tab.textContent = this.value;
+    }
+  });
+});
+
 
     </script>
 </body>
