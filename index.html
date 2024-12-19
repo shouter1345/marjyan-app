@@ -6,67 +6,89 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js"></script>
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
     <style>
+        body{
+            background: #1a1a1a;
+            color: white;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
         .container {
             max-width: 1200px;
             margin: 20px auto;
             padding: 20px;
         }
         .setup-section {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            background: linear-gradient(145deg, #2a2a2a, #333);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            border: 1px solid #444;
         }
         .player-row {
-            margin: 10px 0;
-            padding: 10px;
-            background: #f5f5f5;
-            border-radius: 4px;
+            margin: 15px 0;
+            padding: 15px;
+            background: linear-gradient(to right, rgba(40, 40, 40, 0.9), rgba(50, 50, 50, 0.9));
+            border-radius: 8px;
+            border: 1px solid #444;
         }
         .rank-button {
             margin: 0 5px;
-            padding: 10px 20px;
-            background: white;
-            border: 1px solid #ddd;
+            padding: 12px 25px;
+            background: #2a2a2a;
+            border: 1px solid #555;
+            color: white;
             cursor: pointer;
             transition: all 0.2s;
+            border-radius: 6px;
+        }
+        .rank-button:hover {
+            background: #3a3a3a;
+            transform: translateY(-2px);
         }
         .rank-button.selected {
-            background: #3b82f6;
+            background: #007AFF;
             color: white;
+            border: none;
+            box-shadow: 0 0 15px rgba(0, 122, 255, 0.4);
         }
         .rank-button.disabled {
-            background: #eee;
+            background: #222;
             cursor: not-allowed;
+            color: #666;
         }
         #next-button {
             margin-top: 20px;
-            padding: 10px 20px;
-            width: 100%;
-            background: #3b82f6;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+    padding: 15px 30px;
+    width: 100%;
+    background: linear-gradient(45deg, #007AFF, #00A3FF);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
         }
         #next-button:disabled {
-            background: #ccc;
+            background: linear-gradient(45deg, #333, #444);
+    color: #666;
         }
-        .graph-container {
+        .graph-container, .stats-container {
+            background: linear-gradient(145deg, #2a2a2a, #333);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    margin-top: 30px;
+    border: 1px solid #444;
+        }
+        /* .stats-container {
             margin-top: 30px;
             padding: 20px;
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .stats-container {
-            margin-top: 30px;
-            padding: 20px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
+        } */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -88,10 +110,11 @@
             border-radius: 4px;
         }
         .stats-box {
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 4px;
-            text-align: center;
+            padding: 20px;
+    background: linear-gradient(145deg, #2a2a2a, #333);
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #444;
         }
         .stats-box .stats-value {
             /* ... 既存のスタイル ... */
@@ -99,19 +122,26 @@
         }
         .stats-label {
             font-size: 0.9em;
-            color: #666;
-            margin-bottom: 5px;
+    color: #888;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
         }
         .stats-value {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #333;
+            font-size: 1.4em;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
         }
         .section-title {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #333;
+            font-size: 1.4em;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-bottom: 2px solid #007AFF;
+    padding-bottom: 10px;
         }
         .player-tabs {
             display: flex;
@@ -143,11 +173,12 @@
         }
 
         .player-name {
-        font-size: 16px;
-        padding: 4px 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        min-width: 100px;
+            background: #2a2a2a;
+    color: white;
+    border: 1px solid #444;
+    padding: 8px 12px;
+    border-radius: 6px;
+    min-width: 120px;
         }
 
         .player-name:hover {
@@ -155,10 +186,25 @@
         }
 
         .player-name:focus {
-        outline: none;
-        border-color: #0066cc;
-        box-shadow: 0 0 3px rgba(0, 102, 204, 0.5);
+            border-color: #007AFF;
+    box-shadow: 0 0 10px rgba(0, 122, 255, 0.3);
         }
+
+        input[type="number"] {
+    background: #2a2a2a;
+    color: white;
+    border: 1px solid #444;
+    padding: 8px 12px;
+    border-radius: 6px;
+    width: 80px;
+}
+
+label {
+    color: #888;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
 
         .player-row {
         display: flex;
@@ -172,31 +218,39 @@
 
         .player-tabs {
         display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
+        gap: 15px;
+        margin-bottom: 25px;
         }
 
         .player-tab {
-        padding: 8px 16px;
-        border: none;
-        background: #f0f0f0;
-        cursor: pointer;
-        border-radius: 4px;
+            padding: 12px 25px;
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
         }
 
         .player-tab.active {
-        background: #0066cc;
-        color: white;
+            background: linear-gradient(45deg, #007AFF, #00A3FF);
+    border: none;
+    box-shadow: 0 0 15px rgba(0, 122, 255, 0.3);
         }
 
         .tooltip-container {
-        position: relative;
-        background: #ffe8cc;
-        border-radius: 8px;
-        padding: 12px 20px;
-        margin-bottom: 15px;
-        font-weight: bold;
-        color: #663c00;
+            background: linear-gradient(45deg, #007AFF, #00A3FF);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0, 122, 255, 0.3);
+    animation: glow 2s infinite;
         }
 
         .tooltip-container:after {
@@ -214,6 +268,15 @@
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-5px); }
         }
+
+        @keyframes glow {
+    0%, 100% {
+        box-shadow: 0 5px 15px rgba(0, 122, 255, 0.3);
+    }
+    50% {
+        box-shadow: 0 5px 25px rgba(0, 122, 255, 0.5);
+    }
+}
 
         .tooltip-container {
         animation: bounce 2s infinite;
@@ -238,10 +301,22 @@
 
         /* 設定ボタンのスタイル */
         .setup-button {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #007AFF, #00A3FF);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
         }
+
+        .setup-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 122, 255, 0.3);
+}
 
         .setup-button.clicked {
             background-color: #2563eb;
@@ -634,42 +709,86 @@
             document.getElementById(`${player}-stats`).classList.add('active');
         }
 
+        // function updateStats(player) {
+        //     // 手動入力値の取得
+        //     playerStats[player].agari = parseInt(document.getElementById(`${player}-agari`).value) || 0;
+        //     playerStats[player].dealIn = parseInt(document.getElementById(`${player}-deal-in`).value) || 0;
+
+        //     // トップ回数の計算
+        //     const topCount = results.filter(result => result[player] === 1).length;
+
+        //     // 統計の更新
+        //     document.getElementById(`${player}-hanchan`).textContent = currentHanchan - 1;
+        //     document.getElementById(`${player}-games`).textContent = totalGames;
+        //     document.getElementById(`${player}-top-count`).textContent = topCount;
+        //     document.getElementById(`${player}-top-rate`).textContent = 
+        //         ((topCount / (currentHanchan -1)) * 100).toFixed(1) + '%';
+        //     document.getElementById(`${player}-agari-count`).textContent = playerStats[player].agari;
+        //     document.getElementById(`${player}-agari-rate`).textContent = 
+        //         ((playerStats[player].agari / totalGames) * 100).toFixed(1) + '%';
+        //     document.getElementById(`${player}-deal-in-count`).textContent = playerStats[player].dealIn;
+        //     document.getElementById(`${player}-deal-in-rate`).textContent = 
+        //         ((playerStats[player].dealIn / totalGames) * 100).toFixed(1) + '%';
+
+        //     // 平均着順の計算
+        //     const ranks = results.map(result => result[player]);
+        //     const avgRank = ranks.length > 0 
+        //         ? (ranks.reduce((a, b) => a + b, 0) / ranks.length).toFixed(2)
+        //         : "0.00";    
+        //         // 平均着順の表示を追加
+        //     document.getElementById(`${player}-avg-rank`).textContent = avgRank;
+
+        //     // グラフの平均着順線を更新
+        //     if (rankChart && rankChart.options.plugins.annotation) {
+        //         rankChart.options.plugins.annotation.annotations[`${player}Avg`].yMin = avgRank;
+        //         rankChart.options.plugins.annotation.annotations[`${player}Avg`].yMax = avgRank;
+        //         rankChart.update();
+        //     }
+        // }
+
         function updateStats(player) {
-            // 手動入力値の取得
-            playerStats[player].agari = parseInt(document.getElementById(`${player}-agari`).value) || 0;
-            playerStats[player].dealIn = parseInt(document.getElementById(`${player}-deal-in`).value) || 0;
+    // 手動入力値の取得
+    playerStats[player].agari = parseInt(document.getElementById(`${player}-agari`).value) || 0;
+    playerStats[player].dealIn = parseInt(document.getElementById(`${player}-deal-in`).value) || 0;
 
-            // トップ回数の計算
-            const topCount = results.filter(result => result[player] === 1).length;
+    // 実際に記録された半荘数を使用
+    const completedHanchan = results.length;
 
-            // 統計の更新
-            document.getElementById(`${player}-hanchan`).textContent = currentHanchan - 1;
-            document.getElementById(`${player}-games`).textContent = totalGames;
-            document.getElementById(`${player}-top-count`).textContent = topCount;
-            document.getElementById(`${player}-top-rate`).textContent = 
-                ((topCount / (currentHanchan - 1)) * 100).toFixed(1) + '%';
-            document.getElementById(`${player}-agari-count`).textContent = playerStats[player].agari;
-            document.getElementById(`${player}-agari-rate`).textContent = 
-                ((playerStats[player].agari / totalGames) * 100).toFixed(1) + '%';
-            document.getElementById(`${player}-deal-in-count`).textContent = playerStats[player].dealIn;
-            document.getElementById(`${player}-deal-in-rate`).textContent = 
-                ((playerStats[player].dealIn / totalGames) * 100).toFixed(1) + '%';
+    // トップ回数の計算
+    const topCount = results.filter(result => result[player] === 1).length;
 
-            // 平均着順の計算
-            const ranks = results.map(result => result[player]);
-            const avgRank = ranks.length > 0 
-                ? (ranks.reduce((a, b) => a + b, 0) / ranks.length).toFixed(2)
-                : "0.00";    
-                // 平均着順の表示を追加
-            document.getElementById(`${player}-avg-rank`).textContent = avgRank;
+    // 統計の更新
+    document.getElementById(`${player}-hanchan`).textContent = completedHanchan;
+    document.getElementById(`${player}-games`).textContent = totalGames;
+    document.getElementById(`${player}-top-count`).textContent = topCount;
+    
+    // トップ率の計算を修正（実際の半荘数で割る）
+    const topRate = completedHanchan > 0 
+        ? ((topCount / completedHanchan) * 100).toFixed(1)
+        : "0.0";
+    document.getElementById(`${player}-top-rate`).textContent = topRate + '%';
 
-            // グラフの平均着順線を更新
-            if (rankChart && rankChart.options.plugins.annotation) {
-                rankChart.options.plugins.annotation.annotations[`${player}Avg`].yMin = avgRank;
-                rankChart.options.plugins.annotation.annotations[`${player}Avg`].yMax = avgRank;
-                rankChart.update();
-            }
-        }
+    document.getElementById(`${player}-agari-count`).textContent = playerStats[player].agari;
+    document.getElementById(`${player}-agari-rate`).textContent = 
+        ((playerStats[player].agari / totalGames) * 100).toFixed(1) + '%';
+    document.getElementById(`${player}-deal-in-count`).textContent = playerStats[player].dealIn;
+    document.getElementById(`${player}-deal-in-rate`).textContent = 
+        ((playerStats[player].dealIn / totalGames) * 100).toFixed(1) + '%';
+
+    // 平均着順の計算を修正
+    const ranks = results.map(result => result[player]);
+    const avgRank = completedHanchan > 0
+        ? (ranks.reduce((a, b) => a + b, 0) / completedHanchan).toFixed(2)
+        : "0.00";
+    document.getElementById(`${player}-avg-rank`).textContent = avgRank;
+
+    // グラフの平均着順線を更新
+    if (rankChart && rankChart.options.plugins.annotation) {
+        rankChart.options.plugins.annotation.annotations[`${player}Avg`].yMin = avgRank;
+        rankChart.options.plugins.annotation.annotations[`${player}Avg`].yMax = avgRank;
+        rankChart.update();
+    }
+}
 
 
         function startGame() {
