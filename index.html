@@ -189,6 +189,85 @@
         color: white;
         }
 
+        .tooltip-container {
+        position: relative;
+        background: #ffe8cc;
+        border-radius: 8px;
+        padding: 12px 20px;
+        margin-bottom: 15px;
+        font-weight: bold;
+        color: #663c00;
+        }
+
+        .tooltip-container:after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 80%;
+        border-width: 10px 10px 0;
+        border-style: solid;
+        border-color: #ffe8cc transparent;
+        }
+
+        /* アニメーション */
+        @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+        }
+
+        .tooltip-container {
+        animation: bounce 2s infinite;
+        }
+
+        /* 設定完了メッセージのスタイル */
+        .setup-complete {
+            display: none;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            margin-top: 10px;
+            text-align: center;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 設定ボタンのスタイル */
+        .setup-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .setup-button.clicked {
+            background-color: #2563eb;
+            transform: scale(0.95);
+        }
+
+        /* 波紋エフェクト */
+        .setup-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.6s ease;
+        }
+
+        .setup-button.clicked::after {
+            width: 300%;
+            height: 300%;
+            opacity: 0;
+        }
+
     </style>
 </head>
 <body>
@@ -213,7 +292,11 @@
       </div>
     <div class="container">
         <!-- ゲーム設定部分 -->
-        <div class="setup-section">
+        <!-- <div class="setup-section">
+            <div class="tooltip-container">
+                半荘数と対局数を入れたら設定ボタンを押してね！
+            </div>
+            <div style="display: flex; gap: 20px; flex-direction: column;">
             <div style="display: flex; gap: 20px;">
                 <div>
                     <label for="totalHanchan">合計半荘数：</label>
@@ -224,8 +307,37 @@
                     <input type="number" id="totalGames" value="1" min="1">
                 </div>
                 <button onclick="startGame()" class="player-tab">設定</button>
+                <button onclick="hendleSetup()" class="player-tab setup-button">設定</button>
+                </div>
+                <div id="setup-complete" class="setup-complete">
+                    設定を保存しました！
+                </div>
+            </div>
+        </div> -->
+
+        <div class="setup-section">
+            <div class="tooltip-container">
+                半荘数と対局数を入れたら設定ボタンを押してね！
+            </div>
+            <div style="display: flex; gap: 20px; flex-direction: column;">
+                <div style="display: flex; gap: 20px;">
+                    <div>
+                        <label for="totalHanchan">合計半荘数：</label>
+                        <input type="number" id="totalHanchan" value="1" min="1">
+                    </div>
+                    <div>
+                        <label for="totalGames">総対局数：</label>
+                        <input type="number" id="totalGames" value="1" min="1">
+                    </div>
+                    <button onclick="handleSetup()" class="player-tab setup-button">設定</button>
+                </div>
+                <div id="setupComplete" class="setup-complete">
+                    設定を保存しました！
+                </div>
             </div>
         </div>
+
+
 
         <!-- 順位入力部分 -->
         <h3>第<span id="currentHanchan">1</span>半荘</h3>
@@ -578,6 +690,31 @@
             updateAllStats();
         }
 
+        function handleSetup() {
+            // 既存のstartGame関数を実行
+            startGame();
+
+            // ボタンにクリックエフェクトを追加
+            const button = document.querySelector('.setup-button');
+            button.classList.add('clicked');
+            
+            // 設定完了メッセージを表示
+            const setupComplete = document.getElementById('setupComplete');
+            setupComplete.style.display = 'block';
+            
+            // ツールチップを非表示
+            const tooltip = document.querySelector('.tooltip-container');
+            if (tooltip) {
+                tooltip.style.display = 'none';
+            }
+
+            // 一定時間後にエフェクトをリセット
+            setTimeout(() => {
+                button.classList.remove('clicked');
+                setupComplete.style.display = 'none';
+            }, 2000);
+        }
+
         function updateAllStats() {
             ['you', 'takeda', 'ishie', 'miura'].forEach(player => {
                 updateStats(player);
@@ -671,7 +808,7 @@ function initializeChart() {
                     pointBackgroundColor: 'white',
                     pointBorderWidth: 3,
                     pointBorderColor: colors.you.main,
-                    fill: true
+                    fill: false
                 },
                 {
                     label: playerNames.takeda,
@@ -686,7 +823,7 @@ function initializeChart() {
                     pointBackgroundColor: 'white',
                     pointBorderWidth: 3,
                     pointBorderColor: colors.takeda.main,
-                    fill: true
+                    fill: false
                 },
                 {
                     label: playerNames.ishie,
@@ -701,7 +838,7 @@ function initializeChart() {
                     pointBackgroundColor: 'white',
                     pointBorderWidth: 3,
                     pointBorderColor: colors.ishie.main,
-                    fill: true
+                    fill: false
                 },
                 {
                     label: playerNames.miura,
@@ -716,7 +853,7 @@ function initializeChart() {
                     pointBackgroundColor: 'white',
                     pointBorderWidth: 3,
                     pointBorderColor: colors.miura.main,
-                    fill: true
+                    fill: false
                 }
             ]
         },
