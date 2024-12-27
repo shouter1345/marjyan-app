@@ -602,9 +602,10 @@ label {
 
         /* 合計ポイントのみ強調 */
         .stats-cell[data-highlight="true"] {
-        background: #006937;
-        color: white !important;
-        border-radius: 4px;
+            background: #006937 !important;
+            color: white !important;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
         }
 
         .player-name[data-highlight="true"] {
@@ -759,11 +760,11 @@ label {
             <div style="display: flex; gap: 20px; flex-direction: column;">
                 <div style="display: flex; gap: 20px;">
                     <div>
-                        <label for="totalHanchan">合計半荘数：</label>
+                        <label for="totalHanchan">試合数：</label>
                         <input type="number" id="totalHanchan" value="1" min="1">
                     </div>
                     <div>
-                        <label for="totalGames">総対局数：</label>
+                        <label for="totalGames">総局数：</label>
                         <input type="number" id="totalGames" value="1" min="1">
                     </div>
                     <button onclick="handleSetup()" class="player-tab setup-button">設定</button>
@@ -929,16 +930,16 @@ label {
                 <div class="stats-row">
                     <div class="metric-name">和了回数</div>
                     <div class="stats-cell">
-                        <input type="number" id="you-agari" value="0" min="0" onchange="updateStats('you')">
+                        <input type="number" id="you-agari" value="0" min="0" readonly>
                     </div>
                     <div class="stats-cell">
-                        <input type="number" id="takeda-agari" value="0" min="0" onchange="updateStats('takeda')">
+                        <input type="number" id="takeda-agari" value="0" min="0" readonly>
                     </div>
                     <div class="stats-cell">
-                        <input type="number" id="ishie-agari" value="0" min="0" onchange="updateStats('ishie')">
+                        <input type="number" id="ishie-agari" value="0" min="0" readonly>
                     </div>
                     <div class="stats-cell">
-                        <input type="number" id="miura-agari" value="0" min="0" onchange="updateStats('miura')">
+                        <input type="number" id="miura-agari" value="0" min="0" readonly>
                     </div>
                 </div>
     
@@ -953,16 +954,16 @@ label {
                 <div class="stats-row">
                     <div class="metric-name">放銃回数</div>
                     <div class="stats-cell">
-                        <input type="number" id="you-deal-in" value="0" min="0" onchange="updateStats('you')">
+                        <input type="number" id="you-deal-in" value="0" min="0" readonly>
                     </div>
                     <div class="stats-cell">
-                        <input type="number" id="takeda-deal-in" value="0" min="0" onchange="updateStats('takeda')">
+                        <input type="number" id="takeda-deal-in" value="0" min="0" readonly>
                     </div>
                     <div class="stats-cell">
-                        <input type="number" id="ishie-deal-in" value="0" min="0" onchange="updateStats('ishie')">
+                        <input type="number" id="ishie-deal-in" value="0" min="0" readonly>
                     </div>
                     <div class="stats-cell">
-                        <input type="number" id="miura-deal-in" value="0" min="0" onchange="updateStats('miura')">
+                        <input type="number" id="miura-deal-in" value="0" min="0" readonly>
                     </div>
                 </div>
     
@@ -1090,56 +1091,137 @@ label {
         //     }
         // }
 
-        function updateStats(player) {
-        // 既存の統計計算ロジックを使用
-        playerStats[player].agari = parseInt(document.getElementById(`${player}-agari`).value) || 0;
-        playerStats[player].dealIn = parseInt(document.getElementById(`${player}-deal-in`).value) || 0;
+    //     function updateStats(player) {
+    //     // 既存の統計計算ロジックを使用
+    //     playerStats[player].agari = parseInt(document.getElementById(`${player}-agari`).value) || 0;
+    //     playerStats[player].dealIn = parseInt(document.getElementById(`${player}-deal-in`).value) || 0;
 
-        const completedHanchan = results.length;
-        const topCount = results.filter(result => result[player] === 1).length;
+    //     const completedHanchan = results.length;
+    //     const topCount = results.filter(result => result[player] === 1).length;
         
-        // 素ポイントと順位ポイントの計算
-        // const rawPoints = pointsHistory.map(points => (points[player]) / 1000);
-        const rawPoints = pointsHistory.map(points => points[player]); // 1000で割る処理を削除
-        const totalRawPoints = rawPoints.reduce((a, b) => a + b, 0);
-        const rankPoints = results.map(result => calculateRankPoints(result[player]));
-        const totalRankPoints = rankPoints.reduce((a, b) => a + b, 0);
-        const totalAllPoints = totalRawPoints + totalRankPoints;
+    //     // 素ポイントと順位ポイントの計算
+    //     // const rawPoints = pointsHistory.map(points => (points[player]) / 1000);
+    //     const rawPoints = pointsHistory.map(points => points[player]); // 1000で割る処理を削除
+    //     const totalRawPoints = rawPoints.reduce((a, b) => a + b, 0);
+    //     const rankPoints = results.map(result => calculateRankPoints(result[player]));
+    //     const totalRankPoints = rankPoints.reduce((a, b) => a + b, 0);
+    //     const totalAllPoints = totalRawPoints + totalRankPoints;
 
-        // 統計の更新
-        document.getElementById(`${player}-hanchan`).textContent = completedHanchan;
-        document.getElementById(`${player}-games`).textContent = totalGames;
-        document.getElementById(`${player}-top-count`).textContent = topCount;
-        document.getElementById(`${player}-top-rate`).textContent = 
-            ((topCount / completedHanchan) * 100).toFixed(1) + '%';
-        document.getElementById(`${player}-agari-rate`).textContent = 
-            ((playerStats[player].agari / totalGames) * 100).toFixed(1) + '%';
-        document.getElementById(`${player}-deal-in-rate`).textContent = 
-            ((playerStats[player].dealIn / totalGames) * 100).toFixed(1) + '%';
+    //     // 統計の更新
+    //     document.getElementById(`${player}-hanchan`).textContent = completedHanchan;
+    //     document.getElementById(`${player}-games`).textContent = totalGames;
+    //     document.getElementById(`${player}-top-count`).textContent = topCount;
+    //     document.getElementById(`${player}-top-rate`).textContent = 
+    //         ((topCount / completedHanchan) * 100).toFixed(1) + '%';
+    //     document.getElementById(`${player}-agari-rate`).textContent = 
+    //         ((playerStats[player].agari / totalGames) * 100).toFixed(1) + '%';
+    //     document.getElementById(`${player}-deal-in-rate`).textContent = 
+    //         ((playerStats[player].dealIn / totalGames) * 100).toFixed(1) + '%';
         
-        // 平均着順の計算と更新
-        const ranks = results.map(result => result[player]);
-        const avgRank = completedHanchan > 0
-            ? (ranks.reduce((a, b) => a + b, 0) / completedHanchan).toFixed(2)
-            : "0.00";
-        document.getElementById(`${player}-avg-rank`).textContent = avgRank;
+    //     // 平均着順の計算と更新
+    //     const ranks = results.map(result => result[player]);
+    //     const avgRank = completedHanchan > 0
+    //         ? (ranks.reduce((a, b) => a + b, 0) / completedHanchan).toFixed(2)
+    //         : "0.00";
+    //     document.getElementById(`${player}-avg-rank`).textContent = avgRank;
 
-        // ポイント関連の更新
-        document.getElementById(`${player}-raw-points`).textContent = totalRawPoints.toFixed(2);
-        document.getElementById(`${player}-rank-points`).textContent = totalRankPoints;
-        document.getElementById(`${player}-total-all-points`).textContent = totalAllPoints.toFixed(2);
+    //     // ポイント関連の更新
+    //     document.getElementById(`${player}-raw-points`).textContent = totalRawPoints.toFixed(2);
+    //     document.getElementById(`${player}-rank-points`).textContent = totalRankPoints;
+    //     document.getElementById(`${player}-total-all-points`).textContent = totalAllPoints.toFixed(2);
 
-        // 半荘別詳細の更新
-        if (document.getElementById(`${player}-points-details`)) {
-            const pointsDetails = results.map((result, i) => {
-                const rawPoint = rawPoints[i].toFixed(2);
-                const rankPoint = rankPoints[i];
-                const total = (parseFloat(rawPoint) + rankPoint).toFixed(2);
-                return `${i + 1}半荘: ${result[player]}位 (${rawPoint}+${rankPoint}=${total})`;
-            }).join('<br>');
-            document.getElementById(`${player}-points-details`).innerHTML = pointsDetails;
+    //     // 半荘別詳細の更新
+    //     if (document.getElementById(`${player}-points-details`)) {
+    //         const pointsDetails = results.map((result, i) => {
+    //             const rawPoint = rawPoints[i].toFixed(2);
+    //             const rankPoint = rankPoints[i];
+    //             const total = (parseFloat(rawPoint) + rankPoint).toFixed(2);
+    //             return `${i + 1}半荘: ${result[player]}位 (${rawPoint}+${rankPoint}=${total})`;
+    //         }).join('<br>');
+    //         document.getElementById(`${player}-points-details`).innerHTML = pointsDetails;
+    //     }
+    // }
+
+    function updateStats(player) {
+    // 和了・放銃回数の取得と更新
+    const agariCount = playerStats[player].agari;
+    const dealInCount = playerStats[player].dealIn;
+
+    // プレイヤーの統計データを更新
+    playerStats[player] = {
+        ...playerStats[player],
+        agari: agariCount,
+        dealIn: dealInCount
+    };
+
+    // 合計和了・放銃回数セクションも更新
+    const totalAgariInput = document.getElementById(`${player}-total-agari`);
+    const totalDealInInput = document.getElementById(`${player}-total-deal-in`);
+    if (totalAgariInput) totalAgariInput.value = agariCount;
+    if (totalDealInInput) totalDealInInput.value = dealInCount;
+
+    const completedHanchan = results.length;
+    const topCount = results.filter(result => result[player] === 1).length;
+    
+    // 素ポイントと順位ポイントの計算
+    const rawPoints = pointsHistory.map(points => points[player]);
+    const totalRawPoints = rawPoints.reduce((a, b) => a + b, 0);
+    const rankPoints = results.map(result => calculateRankPoints(result[player]));
+    const totalRankPoints = rankPoints.reduce((a, b) => a + b, 0);
+    const totalAllPoints = totalRawPoints + totalRankPoints;
+
+    // 統計の更新
+    const updateElement = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+    };
+
+    // 基本統計の更新
+    updateElement(`${player}-hanchan`, completedHanchan);
+    updateElement(`${player}-games`, totalGames);
+    updateElement(`${player}-top-count`, topCount);
+    updateElement(`${player}-top-rate`, ((topCount / completedHanchan) * 100).toFixed(1) + '%');
+    
+    // 和了率と放銃率の更新
+    if (totalGames > 0) {
+        updateElement(`${player}-agari-rate`, ((agariCount / totalGames) * 100).toFixed(1) + '%');
+        updateElement(`${player}-deal-in-rate`, ((dealInCount / totalGames) * 100).toFixed(1) + '%');
+    }
+    
+    // 平均着順の計算と更新
+    const ranks = results.map(result => result[player]);
+    const avgRank = completedHanchan > 0
+        ? (ranks.reduce((a, b) => a + b, 0) / completedHanchan).toFixed(2)
+        : "0.00";
+    updateElement(`${player}-avg-rank`, avgRank);
+
+    // ポイント関連の更新
+    updateElement(`${player}-raw-points`, totalRawPoints.toFixed(2));
+    updateElement(`${player}-rank-points`, totalRankPoints);
+    updateElement(`${player}-total-all-points`, totalAllPoints.toFixed(2));
+
+    // 半荘別詳細の更新
+    const pointsDetailsElement = document.getElementById(`${player}-points-details`);
+    if (pointsDetailsElement && results.length > 0) {
+        const pointsDetails = results.map((result, i) => {
+            const rawPoint = rawPoints[i].toFixed(2);
+            const rankPoint = rankPoints[i];
+            const total = (parseFloat(rawPoint) + rankPoint).toFixed(2);
+            return `${i + 1}半荘: ${result[player]}位 (${rawPoint}+${rankPoint}=${total})`;
+        }).join('<br>');
+        pointsDetailsElement.innerHTML = pointsDetails;
+    }
+
+    // グラフの平均着順線を更新
+    if (rankChart && rankChart.options.plugins.annotation) {
+        const annotation = rankChart.options.plugins.annotation.annotations[`${player}Avg`];
+        if (annotation) {
+            annotation.yMin = avgRank;
+            annotation.yMax = avgRank;
+            rankChart.update();
         }
     }
+}
 
     function updatePlayerStats(player) {
         const agariCount = parseInt(document.getElementById(`${player}-agari-input`).value) || 0;
@@ -1153,39 +1235,78 @@ label {
         document.getElementById(`${player}-deal-in-rate`).textContent = `${dealInRate}%`;
     }
 
-    function updateTotalStats() {
-        const players = ['you', 'takeda', 'ishie', 'miura'];
+    // function updateTotalStats() {
+    //     const players = ['you', 'takeda', 'ishie', 'miura'];
         
-        players.forEach(player => {
-            // 入力値の取得
-            const agariCount = parseInt(document.getElementById(`${player}-total-agari`).value) || 0;
-            const dealInCount = parseInt(document.getElementById(`${player}-total-deal-in`).value) || 0;
+    //     players.forEach(player => {
+    //         // 入力値の取得
+    //         const agariCount = parseInt(document.getElementById(`${player}-total-agari`).value) || 0;
+    //         const dealInCount = parseInt(document.getElementById(`${player}-total-deal-in`).value) || 0;
             
-            // 成績表の値を更新
-            const statsRow = document.getElementById(`${player}-stats-row`);
-            if (statsRow) {
-                // 和了回数を更新
-                const agariInput = statsRow.querySelector(`#${player}-agari`);
-                if (agariInput) agariInput.value = agariCount;
+    //         // 成績表の値を更新
+    //         const statsRow = document.getElementById(`${player}-stats-row`);
+    //         if (statsRow) {
+    //             // 成績一覧の値を更新
+    //             const agariInput = document.getElementById(`${player}-agari`);
+    //             const dealInInput = document.getElementById(`${player}-deal-in`);
                 
-                // 放銃回数を更新
-                const dealInInput = statsRow.querySelector(`#${player}-deal-in`);
-                if (dealInInput) dealInInput.value = dealInCount;
+    //             if (agariInput) agariInput.value = agariCount;
+    //             if (dealInInput) dealInInput.value = dealInCount;
                 
-                // 率の更新
-                const agariRate = ((agariCount / totalGames) * 100).toFixed(1);
-                const dealInRate = ((dealInCount / totalGames) * 100).toFixed(1);
+    //             // 率の更新
+    //             const agariRate = totalGames > 0 ? ((agariCount / totalGames) * 100).toFixed(1) : "0.0";
+    //             const dealInRate = totalGames > 0 ? ((dealInCount / totalGames) * 100).toFixed(1) : "0.0";
                 
-                const agariRateElement = statsRow.querySelector(`#${player}-agari-rate`);
-                const dealInRateElement = statsRow.querySelector(`#${player}-deal-in-rate`);
+    //             const agariRateElement = document.getElementById(`${player}-agari-rate`);
+    //             const dealInRateElement = document.getElementById(`${player}-deal-in-rate`);
                 
-                if (agariRateElement) agariRateElement.textContent = `${agariRate}%`;
-                if (dealInRateElement) dealInRateElement.textContent = `${dealInRate}%`;
-            }
-        });
-        updateHighlights();
-    }
+    //             if (agariRateElement) agariRateElement.textContent = `${agariRate}%`;
+    //             if (dealInRateElement) dealInRateElement.textContent = `${dealInRate}%`;
 
+    //             // プレイヤーの統計を更新
+    //             playerStats[player].agari = agariCount;
+    //             playerStats[player].dealIn = dealInCount;
+    //         }
+    //     });
+    //     updateHighlights();
+    //     updateAllStats();
+    // }
+    function updateTotalStats() {
+    const players = ['you', 'takeda', 'ishie', 'miura'];
+    
+    players.forEach(player => {
+        // 合計和了・放銃回数セクションからの入力値を取得
+        const agariCount = parseInt(document.getElementById(`${player}-total-agari`).value) || 0;
+        const dealInCount = parseInt(document.getElementById(`${player}-total-deal-in`).value) || 0;
+        
+        // 成績一覧の値を更新
+        const agariInput = document.getElementById(`${player}-agari`);
+        const dealInInput = document.getElementById(`${player}-deal-in`);
+        
+        if (agariInput) agariInput.value = agariCount;
+        if (dealInInput) dealInInput.value = dealInCount;
+        
+        // 率の更新
+        const agariRate = totalGames > 0 ? ((agariCount / totalGames) * 100).toFixed(1) : "0.0";
+        const dealInRate = totalGames > 0 ? ((dealInCount / totalGames) * 100).toFixed(1) : "0.0";
+        
+        const agariRateElement = document.getElementById(`${player}-agari-rate`);
+        const dealInRateElement = document.getElementById(`${player}-deal-in-rate`);
+        
+        if (agariRateElement) agariRateElement.textContent = `${agariRate}%`;
+        if (dealInRateElement) dealInRateElement.textContent = `${dealInRate}%`;
+        
+        // プレイヤーの統計を更新
+        playerStats[player] = {
+            ...playerStats[player],
+            agari: agariCount,
+            dealIn: dealInCount
+        };
+    });
+    
+    // ハイライトの更新のみ行う（updateAllStatsは呼び出さない）
+    updateHighlights();
+}
     function calculateRankPoints(rank) {
         switch(rank) {
             case 1: return 50;
@@ -1830,6 +1951,7 @@ function updatePlayerName(input) {
         const players = ['you', 'takeda', 'ishie', 'miura'];
         const points = players.map(player => {
             const element = document.getElementById(`${player}-total-all-points`);
+            if (!element) return { player, points: 0 };
             return {
                 player,
                 points: parseFloat(element.textContent) || 0
@@ -1840,58 +1962,137 @@ function updatePlayerName(input) {
         const maxPoints = Math.max(...points.map(p => p.points));
         
         // すべての行からdata属性を削除
-        document.querySelectorAll('.stats-row').forEach(row => {
-            row.removeAttribute('data-highest-points');
-        });
+        const rows = document.querySelectorAll('.stats-row');
+        if (rows) {
+            rows.forEach(row => {
+                if (row) row.removeAttribute('data-highest-points');
+            });
+        }
 
         // 最高ポイントのプレイヤーの行にdata属性を設定
         points.forEach(({player, points}) => {
             if (points === maxPoints) {
                 const row = document.getElementById(`${player}-stats-row`);
-                row.setAttribute('data-highest-points', 'true');
+                if (row) row.setAttribute('data-highest-points', 'true');
             }
         });
     }
+
+    // function updateHighlights() {
+    // const players = ['you', 'takeda', 'ishie', 'miura'];
+    // const metrics = [
+    //     {key: 'total-all-points', type: 'max'},
+    //     {key: 'agari-rate', type: 'max'},
+    //     {key: 'avg-rank', type: 'min'},
+    //     {key: 'top-rate', type: 'max'}
+    // ];
+
+    // // すべてのハイライトを一旦解除
+    // document.querySelectorAll('[data-highlight="true"]').forEach(el => {
+    //     el.removeAttribute('data-highlight');
+    // });
+
+    // metrics.forEach(metric => {
+    //     let bestValue = metric.type === 'max' ? -Infinity : Infinity;
+    //     let bestPlayer = null;
+
+    //     // 最高値を見つける
+    //     players.forEach(player => {
+    //         const cell = document.getElementById(`${player}-${metric.key}`);
+    //         const value = parseFloat(cell.textContent);
+
+    //         if ((metric.type === 'max' && value > bestValue) || 
+    //             (metric.type === 'min' && value < bestValue)) {
+    //             bestValue = value;
+    //             bestPlayer = player;
+    //         }
+    //     });
+
+    //     // 最高値のセルのみをハイライト
+    //     if (bestPlayer) {
+    //         const cell = document.getElementById(`${bestPlayer}-${metric.key}`);
+    //         cell.setAttribute('data-highlight', 'true');
+    //     }
+    // });
+    // }
 
     function updateHighlights() {
-    const players = ['you', 'takeda', 'ishie', 'miura'];
-    const metrics = [
-        {key: 'total-all-points', type: 'max'},
-        {key: 'agari-rate', type: 'max'},
-        {key: 'avg-rank', type: 'min'},
-        {key: 'top-rate', type: 'max'}
-    ];
+   const players = ['you', 'takeda', 'ishie', 'miura'];
+   const metrics = [
+       {key: 'total-all-points', type: 'max'},
+       {key: 'agari-rate', type: 'max'},
+       {key: 'avg-rank', type: 'min'},
+       {key: 'top-rate', type: 'max'}
+   ];
 
-    // すべてのハイライトを一旦解除
-    document.querySelectorAll('[data-highlight="true"]').forEach(el => {
-        el.removeAttribute('data-highlight');
-    });
+//    // すべてのハイライトを一旦解除
+//    document.querySelectorAll('[data-highlight="true"]').forEach(el => {
+//        el.removeAttribute('data-highlight');
+//    });
+
+//    metrics.forEach(metric => {
+//        let bestValue = metric.type === 'max' ? -Infinity : Infinity;
+//        let bestPlayer = null;
+
+//        // 最高値を見つける
+//        players.forEach(player => {
+//            const cell = document.getElementById(`${player}-${metric.key}`);
+//            const value = parseFloat(cell.textContent);
+
+//            if ((metric.type === 'max' && value > bestValue) || 
+//                (metric.type === 'min' && value < bestValue)) {
+//                bestValue = value;
+//                bestPlayer = player;
+//            }
+//        });
+
+//        // 最高値のセルのみをハイライト
+//        if (bestPlayer) {
+//            const cell = document.getElementById(`${bestPlayer}-${metric.key}`);
+//            cell.setAttribute('data-highlight', 'true');
+//        }
+//    });
 
     metrics.forEach(metric => {
-        let bestValue = metric.type === 'max' ? -Infinity : Infinity;
-        let bestPlayer = null;
+            let bestValue = metric.type === 'max' ? -Infinity : Infinity;
+            let bestPlayer = null;
 
-        // 最高値を見つける
-        players.forEach(player => {
-            const cell = document.getElementById(`${player}-${metric.key}`);
-            const value = parseFloat(cell.textContent);
+            players.forEach(player => {
+                const element = document.getElementById(`${player}-${metric.key}`);
+                if (!element) return;
 
-            if ((metric.type === 'max' && value > bestValue) || 
-                (metric.type === 'min' && value < bestValue)) {
-                bestValue = value;
-                bestPlayer = player;
+                const value = parseFloat(element.textContent.replace('%', ''));
+                if (isNaN(value)) return;
+
+                if ((metric.type === 'max' && value > bestValue) || 
+                    (metric.type === 'min' && value < bestValue)) {
+                    bestValue = value;
+                    bestPlayer = player;
+                }
+            });
+
+            // 以前のハイライトを削除
+            players.forEach(player => {
+                const element = document.getElementById(`${player}-${metric.key}`);
+                if (element) {
+                    element.removeAttribute('data-highlight');
+                    element.style.background = '';
+                }
+            });
+
+            // 新しいハイライトを適用
+            if (bestPlayer) {
+                const element = document.getElementById(`${bestPlayer}-${metric.key}`);
+                if (element) {
+                    element.setAttribute('data-highlight', 'true');
+                    element.style.background = '#006937';
+                    element.style.color = 'white';
+                }
             }
         });
+}
 
-        // 最高値のセルのみをハイライト
-        if (bestPlayer) {
-            const cell = document.getElementById(`${bestPlayer}-${metric.key}`);
-            cell.setAttribute('data-highlight', 'true');
-        }
-    });
-    }
-
-
+        
     // イベントリスナーを設定
     document.querySelectorAll('.player-name').forEach(input => {
     input.addEventListener('input', function() {
