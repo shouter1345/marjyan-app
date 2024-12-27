@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js"></script>
@@ -58,17 +62,17 @@
         }
         #next-button {
             margin-top: 20px;
-    padding: 15px 30px;
-    width: 100%;
-    background: linear-gradient(45deg, #007AFF, #00A3FF);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+        padding: 15px 30px;
+        width: 100%;
+        background: linear-gradient(45deg, #007AFF, #00A3FF);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
         }
         #next-button:disabled {
             background: linear-gradient(45deg, #333, #444);
@@ -375,38 +379,72 @@ label {
         /* 成績表のスタイル */
         .stats-table {
             width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-            background: #2a2a2a;
+            border-collapse: separate;
+            border-spacing: 1px;
+            background: #444;
             border-radius: 8px;
             overflow: hidden;
+            margin-bottom: 30px;
         }
 
-        .stats-row {
+        /* .stats-row {
             display: grid;
             grid-template-columns: 2fr repeat(11, 1fr);
             border-bottom: 1px solid #444;
+        } */
+        .stats-row {
+            display: grid;
+            grid-template-columns: 2fr repeat(11, 1fr);
+            background: #2a2a2a;
         }
 
         .stats-row:last-child {
             border-bottom: none;
         }
 
-        .stats-cell {
+        /* .stats-cell {
             padding: 12px;
             text-align: center;
             font-size: 0.9em;
+        } */
+
+        .stats-cell {
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 0.9em;
+            background: #2a2a2a;
+            border-bottom: 1px solid #444;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .stats-row.header {
+        /* .stats-row.header {
             background: #333;
             font-weight: bold;
             color: #fff;
+        } */
+        .stats-row.header {
+            background: #333;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .stats-row.header .stats-cell {
+            background: #333;
+            color: #fff;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .player-name {
             text-align: left;
             padding-left: 20px;
+            justify-content: flex-start;
         }
 
         /* 入力フィールドのスタイル */
@@ -546,6 +584,67 @@ label {
         color: white;
         padding: 4px 8px;
         border-radius: 0 4px 4px 0;
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .stats-row {
+                grid-template-columns: 1fr;
+                margin-bottom: 20px;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            .stats-cell {
+                padding: 12px;
+                font-size: 0.9em;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                text-align: right;
+                border-bottom: 1px solid #444;
+            }
+
+            .stats-cell::before {
+                content: attr(data-label);
+                text-align: left;
+                font-weight: bold;
+                color: #888;
+            }
+
+            .stats-row.header {
+                display: none;
+            }
+
+            .player-name {
+                background: #333;
+                text-align: center;
+                font-weight: bold;
+                grid-template-columns: 1fr;
+            }
+
+            .player-name::before {
+                display: none;
+            }
+
+            .stats-input-section {
+                padding: 15px;
+            }
+
+            .total-stats-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .input-group {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                align-items: center;
+            }
         }
 
 </style>
@@ -729,59 +828,56 @@ label {
             <div class="stats-table">
                 <div class="stats-row header">
                     <div class="stats-cell player-name">プレイヤー</div>
-                    <div class="stats-cell">半荘数</div>
-                    <div class="stats-cell">総対局数</div>
-                    <div class="stats-cell">トップ回数</div>
-                    <div class="stats-cell">トップ率</div>
-                    <div class="stats-cell">和了回数</div>
-                    <div class="stats-cell">和了率</div>
-                    <div class="stats-cell">放銃回数</div>
-                    <div class="stats-cell">放銃率</div>
-                    <div class="stats-cell">平均着順</div>
-                    <div class="stats-cell">素点</div>
-                    <div class="stats-cell">順位P</div>
-                    <div class="stats-cell">合計P</div>
-                </div>
+                <div class="stats-cell">半荘数</div>
+                <div class="stats-cell">総対局数</div>
+                <div class="stats-cell">トップ回数</div>
+                <div class="stats-cell">トップ率</div>
+                <div class="stats-cell">和了回数</div>
+                <div class="stats-cell">和了率</div>
+                <div class="stats-cell">放銃回数</div>
+                <div class="stats-cell">放銃率</div>
+                <div class="stats-cell">平均着順</div>
+                <div class="stats-cell">素点</div>
+                <div class="stats-cell">順位P</div>
+            </div>
 
-                <div class="stats-row" id="you-stats-row">
-                    <div class="stats-cell player-name">You</div>
-                    <div class="stats-cell" id="you-hanchan">0</div>
-                    <div class="stats-cell" id="you-games">0</div>
-                    <div class="stats-cell" id="you-top-count">0</div>
-                    <div class="stats-cell" id="you-top-rate">0%</div>
-                    <div class="stats-cell">
-                        <input type="number" id="you-agari" value="0" min="0" onchange="updateStats('you')">
-                    </div>
-                    <div class="stats-cell" id="you-agari-rate">0%</div>
-                    <div class="stats-cell">
-                        <input type="number" id="you-deal-in" value="0" min="0" onchange="updateStats('you')">
-                    </div>
-                    <div class="stats-cell" id="you-deal-in-rate">0%</div>
-                    <div class="stats-cell" id="you-avg-rank">0.00</div>
-                    <div class="stats-cell" id="you-raw-points">0.00</div>
-                    <div class="stats-cell" id="you-rank-points">0</div>
-                    <div class="stats-cell" id="you-total-all-points">0.00</div>
+            <div class="stats-row" id="you-stats-row">
+                <div class="stats-cell player-name" data-label="プレイヤー">You</div>
+                <div class="stats-cell" id="you-hanchan" data-label="半荘数">0</div>
+                <div class="stats-cell" id="you-games" data-label="総対局数">0</div>
+                <div class="stats-cell" id="you-top-count" data-label="トップ回数">0</div>
+                <div class="stats-cell" id="you-top-rate" data-label="トップ率">0%</div>
+                <div class="stats-cell" data-label="和了回数">
+                    <input type="number" id="you-agari" value="0" min="0" onchange="updateStats('you')">
                 </div>
+                <div class="stats-cell" id="you-agari-rate" data-label="和了率">0%</div>
+                <div class="stats-cell" data-label="放銃回数">
+                    <input type="number" id="you-deal-in" value="0" min="0" onchange="updateStats('you')">
+                </div>
+                <div class="stats-cell" id="you-deal-in-rate" data-label="放銃率">0%</div>
+                <div class="stats-cell" id="you-avg-rank" data-label="平均着順">0.00</div>
+                <div class="stats-cell" id="you-raw-points" data-label="素点">0.00</div>
+                <div class="stats-cell" id="you-rank-points" data-label="順位P">0</div>
+            </div>
 
-                <div class="stats-row" id="takeda-stats-row">
-                    <div class="stats-cell player-name">石江</div>
-                    <div class="stats-cell" id="takeda-hanchan">0</div>
-                    <div class="stats-cell" id="takeda-games">0</div>
-                    <div class="stats-cell" id="takeda-top-count">0</div>
-                    <div class="stats-cell" id="takeda-top-rate">0%</div>
-                    <div class="stats-cell">
-                        <input type="number" id="takeda-agari" value="0" min="0" onchange="updateStats('takeda')">
-                    </div>
-                    <div class="stats-cell" id="takeda-agari-rate">0%</div>
-                    <div class="stats-cell">
-                        <input type="number" id="takeda-deal-in" value="0" min="0" onchange="updateStats('takeda')">
-                    </div>
-                    <div class="stats-cell" id="takeda-deal-in-rate">0%</div>
-                    <div class="stats-cell" id="takeda-avg-rank">0.00</div>
-                    <div class="stats-cell" id="takeda-raw-points">0.00</div>
-                    <div class="stats-cell" id="takeda-rank-points">0</div>
-                    <div class="stats-cell" id="takeda-total-all-points">0.00</div>
+            <div class="stats-row" id="takeda-stats-row">
+                <div class="stats-cell player-name" data-label="プレイヤー">武田</div>
+                <div class="stats-cell" id="takeda-hanchan" data-label="半荘数">0</div>
+                <div class="stats-cell" id="takeda-games" data-label="総対局数">0</div>
+                <div class="stats-cell" id="takeda-top-count" data-label="トップ回数">0</div>
+                <div class="stats-cell" id="takeda-top-rate" data-label="トップ率">0%</div>
+                <div class="stats-cell" data-label="和了回数">
+                    <input type="number" id="takeda-agari" value="0" min="0" onchange="updateStats('takeda')">
                 </div>
+                <div class="stats-cell" id="takeda-agari-rate" data-label="和了率">0%</div>
+                <div class="stats-cell" data-label="放銃回数">
+                    <input type="number" id="takeda-deal-in" value="0" min="0" onchange="updateStats('takeda')">
+                </div>
+                <div class="stats-cell" id="takeda-deal-in-rate" data-label="放銃率">0%</div>
+                <div class="stats-cell" id="takeda-avg-rank" data-label="平均着順">0.00</div>
+                <div class="stats-cell" id="takeda-raw-points" data-label="素点">0.00</div>
+                <div class="stats-cell" id="takeda-rank-points" data-label="順位P">0</div>
+            </div>
 
                 <div class="stats-row" id="ishie-stats-row">
                     <div class="stats-cell player-name">石江</div>
