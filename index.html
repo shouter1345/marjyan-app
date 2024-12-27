@@ -626,29 +626,77 @@ label {
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
+                margin: 10px;
+                width: auto;
             }
 
             .stats-table {
+                font-size: 0.85em;
+                margin: 0;
+                padding: 0;
+                width: 100%;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
 
-            .stats-row {
+            /* .stats-row {
                 grid-template-columns: 1fr;
                 margin-bottom: 20px;
                 border-radius: 8px;
                 overflow: hidden;
+            } */
+
+            .stats-row {
+                display: flex;
+                min-width: 600px; /* スクロール可能な最小幅を設定 */
             }
 
             .stats-cell {
-                min-width: 80px;
-                font-size: 0.85em;
+                min-width: 60px;
+                font-size: 0.9em;
                 padding: 8px 4px;
             }
 
             .metric-name {
-                flex: 0 0 120px;
-                font-size: 0.85em;
+                flex: 0 0 100px;
+                font-size: 0.9em;
+                padding: 8px 4px;
+            }
+
+            .stats-cell input {
+                width: 50px;
+                padding: 4px;
+                font-size: 0.9em;
+            }
+
+            .stats-container {
+                position: relative;
+            }
+
+            .stats-container::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                width: 20px;
+                background: linear-gradient(to left, rgba(42, 42, 42, 0.8), transparent);
+                pointer-events: none;
+            }
+
+            /* セクションタイトルの調整 */
+            .section-title {
+                font-size: 1.2em;
+                margin: 15px 0;
+                padding-bottom: 8px;
+            }
+
+            /* プレイヤー名の表示調整 */
+            .stats-header .stats-cell {
+                font-weight: bold;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
             /* スクロールの存在を示すインジケータ */
@@ -699,6 +747,41 @@ label {
                 grid-template-columns: 1fr 1fr;
                 align-items: center;
             }
+        }
+
+        /* iPhone SE など小さい画面用 */
+        @media (max-width: 375px) {
+            .stats-cell {
+                min-width: 50px;
+                font-size: 0.8em;
+            }
+
+            .metric-name {
+                flex: 0 0 80px;
+                font-size: 0.8em;
+            }
+
+            .stats-cell input {
+                width: 40px;
+                font-size: 0.8em;
+            }
+        }
+
+        /* 横スクロールを示すアニメーション */
+        @keyframes scrollHint {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .scroll-hint {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            animation: scrollHint 2s infinite;
+            pointer-events: none;
         }
         /* ハイライト効果 */
         .stats-cell[data-highlight="true"] {
@@ -882,6 +965,7 @@ label {
 
         <!-- 成績表部分 -->
         <div class="stats-container">
+            <div class="scroll-hint">←→</div>
             <div class="section-title">成績一覧</div>
             
             <div class="stats-table">
