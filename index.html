@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js"></script>
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
     <style>
         body{
@@ -1307,18 +1304,6 @@ label {
     }
 }
 
-    function updatePlayerStats(player) {
-        const agariCount = parseInt(document.getElementById(`${player}-agari-input`).value) || 0;
-        const dealInCount = parseInt(document.getElementById(`${player}-deal-in-input`).value) || 0;
-        
-        // 和了率と放銃率を更新
-        const agariRate = (agariCount / totalGames * 100).toFixed(1);
-        const dealInRate = (dealInCount / totalGames * 100).toFixed(1);
-        
-        document.getElementById(`${player}-agari-rate`).textContent = `${agariRate}%`;
-        document.getElementById(`${player}-deal-in-rate`).textContent = `${dealInRate}%`;
-    }
-
     // function updateTotalStats() {
     //     const players = ['you', 'takeda', 'ishie', 'miura'];
         
@@ -1894,27 +1879,6 @@ function updateChart() {
     rankChart.update();
 }
 
-// グラフ更新時の処理
-function updateGraphNames() {
-  const playerNames = {
-    player1: document.querySelector('[name="player1"]').value || 'プレイヤー1',
-    player2: document.querySelector('[name="player2"]').value || 'プレイヤー2',
-    player3: document.querySelector('[name="player3"]').value || 'プレイヤー3',
-    player4: document.querySelector('[name="player4"]').value || 'プレイヤー4'
-  };
-
-  // グラフの凡例とデータ系列の名前を更新
-  if (chart && chart.series) {
-    chart.series.forEach((series, index) => {
-      const playerKey = `player${index + 1}`;
-      series.update({
-        name: playerNames[playerKey]
-      }, false);
-    });
-    chart.redraw();
-  }
-}
-
 function updatePlayerNames() {
   const players = {
     player1: document.querySelector('[name="player1"]').value || 'プレイヤー1',
@@ -2116,8 +2080,11 @@ function updatePlayerName(input) {
    const metrics = [
        {key: 'total-all-points', type: 'max'},
        {key: 'agari-rate', type: 'max'},
+       {key: 'deal-in-rate', type: 'min'},
        {key: 'avg-rank', type: 'min'},
-       {key: 'top-rate', type: 'max'}
+       {key: 'top-rate', type: 'max'},
+       {key: 'raw-points', type: 'max'},    // 素点は高いほうが良い
+       {key: 'rank-points', type: 'max'}     // 順位Pは高いほうが良い
    ];
 
 //    // すべてのハイライトを一旦解除
@@ -2182,6 +2149,11 @@ function updatePlayerName(input) {
                     element.setAttribute('data-highlight', 'true');
                     element.style.background = '#006937';
                     element.style.color = 'white';
+
+                    if (element.tagName.toLowerCase() === 'input') {
+                    element.style.color = 'white';
+                    element.style.borderColor = '#006937';
+                }
                 }
             }
         });
