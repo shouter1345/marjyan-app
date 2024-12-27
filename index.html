@@ -1992,10 +1992,16 @@ function updatePlayerName(input) {
       nameElement.textContent = newName;
     }
   }
-  // 成績一覧の名前を更新
-    const statsRow = document.querySelector(`#${playerId}-stats-row .player-name`);
-    if (statsRow) {
-        statsRow.textContent = newName;
+//   // 成績一覧の名前を更新
+//     const statsRow = document.querySelector(`#${playerId}-stats-row .player-name`);
+//     if (statsRow) {
+//         statsRow.textContent = newName;
+//     }
+
+    // 成績一覧のヘッダーの名前を更新
+    const headerCell = document.querySelector(`.stats-header .stats-cell:nth-child(${getPlayerColumnIndex(playerId)})`);
+    if (headerCell) {
+        headerCell.textContent = newName;
     }
 
     // 合計和了・放銃回数セクションの名前を更新
@@ -2006,6 +2012,11 @@ function updatePlayerName(input) {
 
     // 半荘別詳細の更新関数を呼び出し
     updatePointsDetails(playerId);
+
+    // グラフの更新
+    if (rankChart) {
+        initializeChart();
+    }
     }
 
     function getPlayerIndex(playerId) {
@@ -2175,6 +2186,12 @@ function updatePlayerName(input) {
             }
         });
 }
+
+    // プレイヤーの列インデックスを取得する補助関数
+    function getPlayerColumnIndex(playerId) {
+        const players = ['you', 'takeda', 'ishie', 'miura'];
+        return players.indexOf(playerId) + 2; // +2 because first column is metric-name
+    }
 
         
     // イベントリスナーを設定
