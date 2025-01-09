@@ -550,12 +550,6 @@ label {
             position: relative; /* 位置関係の明確化 */
             z-index: 1; /* 重なり順の制御 */
         }
-        /* グラフの高さ固定を明示的に設定 */
-        .graph-container > div {
-            height: 300px !important; /* 高さを300pxに固定 */
-            margin: 0; /* マージンを削除 */
-            padding: 0; /* パディングを削除 */
-        }
 
         .total-stats-grid {
             display: grid;
@@ -642,6 +636,13 @@ label {
             border: 1px solid #444;
         }
 
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
         /* レスポンシブ対応 */
         @media (max-width: 768px) {
             .container {
@@ -654,8 +655,7 @@ label {
                 font-size: 0.85em;
                 margin: 0;
                 padding: 0;
-                /* width: 100%; */
-                min-width: 100%;
+                width: 100%;
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
             }
@@ -669,40 +669,19 @@ label {
 
             .stats-row {
                 display: flex;
-                min-width: 500px; /* スクロール可能な最小幅を設定 */
+                min-width: 600px; /* スクロール可能な最小幅を設定 */
             }
 
             .stats-cell {
-                min-width: 70px;
-                font-size: 0.85em;
+                min-width: 60px;
+                font-size: 0.9em;
                 padding: 8px 4px;
-                white-space: nowrap;
-            }
-
-            /* 統計グリッドの調整 */
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
-            }
-
-            .stats-box {
-                padding: 10px;
-                min-height: 80px;
-            }
-
-            /* 合計和了・放銃回数セクションの調整 */
-            .total-stats-row {
-                display: grid;
-                grid-template-columns: 1fr;
-                gap: 10px;
             }
 
             .metric-name {
                 flex: 0 0 100px;
-                font-size: 0.85em;
+                font-size: 0.9em;
                 padding: 8px 4px;
-                min-width: 80px;
-                white-space: 10px;
             }
 
             .stats-cell input {
@@ -712,10 +691,7 @@ label {
             }
 
             .stats-container {
-                /* position: relative; */
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-                padding: 10px;
+                position: relative;
             }
 
             .stats-container::after {
@@ -772,14 +748,6 @@ label {
                 text-align: center;
                 font-weight: bold;
                 grid-template-columns: 1fr;
-                width: 100%;
-                max-width: 200%;
-            }
-
-            /* プレイヤー名入力の調整 */
-            .player-name-container {
-                flex-wrap: wrap;
-                gap: 5px;
             }
 
             .player-name::before {
@@ -787,11 +755,7 @@ label {
             }
 
             .stats-input-section {
-                /* padding: 15px; */
-                margin-top: 30px;
-            }
-            .graph-container > div {
-                height: 250px !important; /* モバイルでは高さを少し小さく */
+                padding: 15px;
             }
 
             .total-stats-row {
@@ -803,72 +767,6 @@ label {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
                 align-items: center;
-                gap: 5px;
-            }
-
-            /* ボタンの調整 */
-            .setup-button, #next-button {
-                width: 100%;
-                padding: 12px;
-                font-size: 0.9em;
-            }
-
-            /* グラフコンテナの調整 */
-            .graph-container {
-                margin-top: 20px;
-                padding: 15px;
-            }
-
-            /* セクションタイトルの調整 */
-            .section-title {
-                font-size: 1.1em;
-                margin: 10px 0;
-            }
-
-            /* 詳細情報の調整 */
-            .points-details-grid {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-
-            .points-details-cell {
-                font-size: 0.85em;
-                padding: 10px;
-                word-break: break-word;
-            }
-            /* プレイヤー行の調整 */
-            .player-row {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 5px;
-                padding: 10px;
-            }
-            .player-row span {
-                width: 60px;
-                min-width: 60px;
-                font-size: 0.9em;
-            }
-
-            .points-input {
-                width: 70px;
-                min-width: 70px;
-                font-size: 0.9em;
-            }
-
-            .rank-button {
-                padding: 8px 15px;
-                font-size: 0.9em;
-                min-width: 45px;
-            }
-            /* 入力フィールドの調整 */
-            input[type="number"] {
-                width: 60px;
-                font-size: 0.9em;
-            }
-            /* プレイヤー名入力の調整 */
-            .player-name-container {
-                flex-wrap: wrap;
-                gap: 5px;
             }
         }
 
@@ -1224,10 +1122,11 @@ label {
         <button id="next-button" onclick="nextHanchan()" disabled>次の半荘へ</button>
 
         <!-- グラフ部分 -->
+        <!-- HTMLの修正部分 -->
         <div class="graph-container">
             <div class="section-title">順位推移</div>
-            <div style="height: 500px; /* グラフの高さを固定 */">
-            <canvas id="rankChart"></canvas>
+            <div class="chart-wrapper">
+                <canvas id="rankChart"></canvas>
             </div>
         </div>
 
@@ -1974,17 +1873,17 @@ function initializeChart() {
             },
             layout: {
                 padding: {
-                    top: 20,
-                    right: 20,
-                    bottom: 20,
-                    left: 20
+                    top: 10,
+                    right: 25,
+                    bottom: 10,
+                    left: 25
                 }
             },
             scales: {
                 y: {
                     reverse: true,
-                    min: 0.5,
-                    max: 4.5,
+                    min: 1,
+                    max: 4,
                     ticks: {
                         stepSize: 1,
                         font: {
@@ -2005,7 +1904,7 @@ function initializeChart() {
                 x: {
                     ticks: {
                         font: {
-                            size: 16,    // 目盛りのフォントサイズを大きく
+                            size: 1,    // 目盛りのフォントサイズを大きく
                             weight: 'bold'
                         }
                     },
@@ -2131,7 +2030,9 @@ function initializeChart() {
                 axis: 'x'
             }
         }
+        
     });
+    
 }
 
 // プレイヤー名が変更されたときにグラフを更新する関数
