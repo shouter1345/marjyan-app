@@ -140,13 +140,22 @@
         }
         .section-title {
             font-size: 1.4em;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #fff;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    border-bottom: 2px solid #007AFF;
-    padding-bottom: 10px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 2px solid #007AFF;
+            padding-bottom: 10px;
+            background: linear-gradient(145deg, #2a2a2a, #333);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* コンテナ間の区切りをより明確に */
+        .container > div:not(:last-child) {
+            margin-bottom: 40px;
         }
         .player-tabs {
             display: flex;
@@ -536,11 +545,16 @@ label {
         }
 
         .stats-input-section {
-            background: linear-gradient(145deg, #2a2a2a, #333);
-            padding: 25px;
-            border-radius: 12px;
-            margin: 20px 0;
-            border: 1px solid #444;
+            margin-top: 50px; /* 上部の余白を増やす */
+            clear: both; /* フロートの解除 */
+            position: relative; /* 位置関係の明確化 */
+            z-index: 1; /* 重なり順の制御 */
+        }
+        /* グラフの高さ固定を明示的に設定 */
+        .graph-container > div {
+            height: 300px !important; /* 高さを300pxに固定 */
+            margin: 0; /* マージンを削除 */
+            padding: 0; /* パディングを削除 */
         }
 
         .total-stats-grid {
@@ -617,6 +631,15 @@ label {
         color: white;
         padding: 4px 8px;
         border-radius: 0 4px 4px 0;
+        }
+
+        .graph-container {
+            background: linear-gradient(145deg, #2a2a2a, #333);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin-top: 30px;
+            border: 1px solid #444;
         }
 
         /* レスポンシブ対応 */
@@ -764,7 +787,11 @@ label {
             }
 
             .stats-input-section {
-                padding: 15px;
+                /* padding: 15px; */
+                margin-top: 30px;
+            }
+            .graph-container > div {
+                height: 250px !important; /* モバイルでは高さを少し小さく */
             }
 
             .total-stats-row {
@@ -788,8 +815,8 @@ label {
 
             /* グラフコンテナの調整 */
             .graph-container {
-                height: 300px;
-                margin: 15px 0;
+                margin-top: 20px;
+                padding: 15px;
             }
 
             /* セクションタイトルの調整 */
