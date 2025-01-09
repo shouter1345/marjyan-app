@@ -1099,6 +1099,25 @@ label {
                 <div class="points-details-cell" id="miura-points-details"></div>
             </div>
         </div>
+
+        <div class="setup-section">
+            <div class="section-title">データの保存/読み込み</div>
+            <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+                <button onclick="saveToLocalStorage()" class="player-tab">現在のデータを保存</button>
+                <button onclick="loadFromLocalStorage()" class="player-tab">保存したデータを読み込む</button>
+                <button onclick="exportToJson()" class="player-tab">JSONとしてエクスポート</button>
+                <input type="file" id="jsonFileInput" accept=".json" style="display: none;" onchange="importFromJson(event)">
+                <button onclick="document.getElementById('jsonFileInput').click()" class="player-tab">JSONを読み込む</button>
+            </div>
+        </div>
+
+        <!-- エクスポートボタンを追加 -->
+    <div class="setup-section">
+        <div class="section-title">成績データのエクスポート</div>
+        <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+            <button onclick="exportStatsToCSV()" class="player-tab">成績表をCSVでエクスポート</button>
+        </div>
+</div>
     </div>
 
     <script>
@@ -1378,7 +1397,7 @@ label {
 }
     function calculateRankPoints(rank) {
         switch(rank) {
-            case 1: return 50;
+            case 1: return 30;
             case 2: return 10;
             case 3: return -10;
             case 4: return -30;
@@ -1981,7 +2000,7 @@ function updatePlayerName(input) {
     if (rankChart) {
         initializeChart();
     }
-    }
+}
 
     function getPlayerIndex(playerId) {
         const players = ['you', 'takeda', 'ishie', 'miura'];
@@ -2164,6 +2183,244 @@ function updatePlayerName(input) {
         const players = ['you', 'takeda', 'ishie', 'miura'];
         return players.indexOf(playerId) + 2; // +2 because first column is metric-name
     }
+
+    // データの保存と読み込みに関する関数群
+function getAllGameData() {
+    return {
+        currentHanchan,
+        totalHanchan,
+        totalGames,
+        selectedRanks,
+        results,
+        pointsHistory,
+        playerStats,
+        playerNames: {
+            you: document.getElementById('player1-name').value,
+            takeda: document.getElementById('player2-name').value,
+            ishie: document.getElementById('player3-name').value,
+            miura: document.getElementById('player4-name').value
+        }
+    };
+}
+
+function saveToLocalStorage() {
+    try {
+        const gameData = getAllGameData();
+        localStorage.setItem('mahjongGameData', JSON.stringify(gameData));
+        alert('データを保存しました！');
+    } catch (error) {
+        alert('データの保存に失敗しました: ' + error.message);
+    }
+}
+
+function loadFromLocalStorage() {
+    try {
+        const savedData = localStorage.getItem('mahjongGameData');
+        if (!savedData) {
+            alert('保存されているデータがありません');
+            return;
+        }
+        
+        applyLoadedData(JSON.parse(savedData));
+        alert('データを読み込みました！');
+    } catch (error) {
+        alert('データの読み込みに失敗しました: ' + error.message);
+    }
+}
+
+function exportToJson() {
+    try {
+        const gameData = getAllGameData();
+        const dataStr = JSON.stringify(gameData, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `mahjong-game-data-${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        alert('エクスポートに失敗しました: ' + error.message);
+    }
+}
+
+function importFromJson(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const gameData = JSON.parse(e.target.result);
+            applyLoadedData(gameData);
+            alert('データを読み込みました！');
+        } catch (error) {
+            alert('データの読み込みに失敗しました: ' + error.message);
+        }
+    };
+    reader.readAsText(file);
+    // ファイル入力をリセット（同じファイルを再度選択できるように）
+    event.target.value = '';
+}
+
+function applyLoadedData(gameData) {
+    // 基本データの復元
+    currentHanchan = gameData.currentHanchan;
+    totalHanchan = gameData.totalHanchan;
+    totalGames = gameData.totalGames;
+    selectedRanks = gameData.selectedRanks;
+    results = gameData.results;
+    pointsHistory = gameData.pointsHistory;
+    playerStats = gameData.playerStats;
+
+    // プレイヤー名の復元
+    const playerInputs = {
+        'player1-name': { value: gameData.playerNames.you, id: 'you' },
+        'player2-name': { value: gameData.playerNames.takeda, id: 'takeda' },
+        'player3-name': { value: gameData.playerNames.ishie, id: 'ishie' },
+        'player4-name': { value: gameData.playerNames.miura, id: 'miura' }
+    };
+
+    // 各プレイヤーの名前を更新
+    Object.entries(playerInputs).forEach(([inputId, data]) => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.value = data.value;
+            // 対応する行のプレイヤー名を更新
+            const playerRow = document.getElementById(`${data.id}-row`);
+            if (playerRow) {
+                const nameSpan = playerRow.querySelector('span');
+                if (nameSpan) {
+                    nameSpan.textContent = data.value;
+                }
+            }
+            // プレイヤー名の変更イベントを発火させて、関連する全ての要素を更新
+            input.dispatchEvent(new Event('input'));
+        }
+    });
+
+    // UIの更新
+    document.getElementById('currentHanchan').textContent = currentHanchan;
+    document.getElementById('totalHanchan').value = totalHanchan;
+    document.getElementById('totalGames').value = totalGames;
+
+    // プレイヤーの統計データを更新
+    updateAllStats();
+    
+    // グラフの再描画
+    initializeChart();
+    updateChart();
+    
+    // 和了・放銃回数の更新
+    Object.keys(playerStats).forEach(player => {
+        const agariInput = document.getElementById(`${player}-total-agari`);
+        const dealInInput = document.getElementById(`${player}-total-deal-in`);
+        if (agariInput) agariInput.value = playerStats[player].agari;
+        if (dealInInput) dealInInput.value = playerStats[player].dealIn;
+        
+        // 更新イベントを発火させて関連する統計を更新
+        if (agariInput) agariInput.dispatchEvent(new Event('change'));
+        if (dealInInput) dealInInput.dispatchEvent(new Event('change'));
+        
+        // 対応するプレイヤーの詳細情報も更新
+        const detailsElement = document.getElementById(`${player}-points-details`);
+        if (detailsElement) {
+            updatePointsDetails(player);
+        }
+    });
+
+    // 成績表のヘッダー更新
+    const headerCells = document.querySelectorAll('.stats-header .stats-cell');
+    if (headerCells.length >= 4) {
+        headerCells[0].textContent = gameData.playerNames.you;
+        headerCells[1].textContent = gameData.playerNames.takeda;
+        headerCells[2].textContent = gameData.playerNames.ishie;
+        headerCells[3].textContent = gameData.playerNames.miura;
+    }
+
+    // 合計和了・放銃回数セクションの名前更新
+    const totalStatsRows = document.querySelectorAll('.total-stats-row .player-name');
+    if (totalStatsRows.length >= 4) {
+        totalStatsRows[0].textContent = gameData.playerNames.you;
+        totalStatsRows[1].textContent = gameData.playerNames.takeda;
+        totalStatsRows[2].textContent = gameData.playerNames.ishie;
+        totalStatsRows[3].textContent = gameData.playerNames.miura;
+    }
+
+    // 更新後のハイライトと統計の再計算
+    updateHighlights();
+
+    // ボタンの状態を更新
+    updateButtons();
+    updateNextButton();
+}
+
+    // 基本的な成績データをCSVとしてエクスポート
+function exportStatsToCSV() {
+    try {
+        // プレイヤー名を取得
+        const playerNames = {
+            you: document.getElementById('player1-name').value || 'You',
+            takeda: document.getElementById('player2-name').value || '武田',
+            ishie: document.getElementById('player3-name').value || '石江',
+            miura: document.getElementById('player4-name').value || '三浦'
+        };
+
+        // ヘッダー行を作成
+        const headers = ['指標', playerNames.you, playerNames.takeda, playerNames.ishie, playerNames.miura];
+
+        // データ行を作成
+        const rows = [
+            ['半荘数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-hanchan`).textContent)],
+            ['総対局数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-games`).textContent)],
+            ['トップ回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-top-count`).textContent)],
+            ['トップ率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-top-rate`).textContent)],
+            ['和了回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-agari`).value)],
+            ['和了率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-agari-rate`).textContent)],
+            ['放銃回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-deal-in`).value)],
+            ['放銃率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-deal-in-rate`).textContent)],
+            ['平均着順', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-avg-rank`).textContent)],
+            ['素点', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-raw-points`).textContent)],
+            ['順位P', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-rank-points`).textContent)],
+            ['合計P', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-total-all-points`).textContent)]
+        ];
+
+        // CSVデータを作成
+        const csvContent = [
+            headers.join(','),
+            ...rows.map(row => row.join(','))
+        ].join('\n');
+
+        // CSVファイルとしてダウンロード
+        downloadCSV(csvContent, `mahjong-stats-${new Date().toISOString().slice(0,10)}.csv`);
+
+    } catch (error) {
+        alert('エクスポートに失敗しました: ' + error.message);
+    }
+}
+
+// CSVファイルをダウンロードする共通関数
+function downloadCSV(csvContent, filename) {
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+// Shift-JISエンコードに変換する関数（必要に応じて）
+function convertToSjis(str) {
+    return str.replace(/[^\x00-\x7F]/g, function(char) {
+        return '?' // 簡易的な置換
+    });
+}
 
         
     // イベントリスナーを設定
