@@ -994,6 +994,101 @@ label {
         }
     }
 
+    .title-section {
+        text-align: center;
+        margin: 30px auto;
+        max-width: 600px;
+        padding: 20px;
+        background: linear-gradient(145deg, #2a2a2a, #333);
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        border: 1px solid #444;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .title-section::before, .title-section::after {
+        content: "";
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        background: rgba(0, 122, 255, 0.1);
+        border-radius: 50%;
+        z-index: 0;
+    }
+    
+    .title-section::before {
+        left: -15px;
+        top: -15px;
+    }
+    
+    .title-section::after {
+        right: -15px;
+        bottom: -15px;
+    }
+    
+    .title-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .main-title {
+        color: white;
+        font-size: 2.5em;
+        font-weight: bold;
+        letter-spacing: 4px;
+        margin: 0 20px;
+        text-shadow: 2px 2px 8px rgba(0, 122, 255, 0.6);
+        font-family: "ヒラギノ明朝 ProN", "Yu Mincho", serif;
+    }
+    
+    .title-ornament {
+        font-size: 2em;
+        color: #ff4500;
+        margin: 0 10px;
+        transform: rotate(0deg);
+        animation: tiltTile 3s infinite alternate;
+    }
+    
+    .title-ornament.left {
+        animation-delay: 0s;
+    }
+    
+    .title-ornament.right {
+        animation-delay: 1.5s;
+    }
+    
+    @keyframes tiltTile {
+        0% { transform: rotate(-5deg); }
+        100% { transform: rotate(5deg); }
+    }
+    
+    .subtitle {
+        color: #aaa;
+        font-size: 1.2em;
+        letter-spacing: 2px;
+        font-style: italic;
+        position: relative;
+        z-index: 1;
+        font-family: "ヒラギノ明朝 ProN", "Yu Mincho", serif;
+    }
+    
+    @media (max-width: 768px) {
+        .main-title {
+        font-size: 1.8em;
+        }
+        
+        .subtitle {
+        font-size: 1em;
+        }
+        
+        .title-ornament {
+        font-size: 1.5em;
+        }
+    }
+
 </style>
 <!-- プレイヤー行のHTML構造を修正 -->
 <template id="player-row-template">
@@ -1010,23 +1105,31 @@ label {
 </template>
 </head>
 <body>
+    <div class="title-section">
+        <div class="title-container">
+          <div class="title-ornament left">&#x1f004;</div>
+          <h1 class="main-title">麻雀成績入力帳</h1>
+          <div class="title-ornament right">&#x1f004;</div>
+        </div>
+        <div class="subtitle">～ 対局の記録と分析 ～</div>
+      </div>
 
     <div class="setup-section">
         <div class="player-name-container">
-          <label>プレイヤー1:</label>
-          <input type="text" class="player-name" id="player1-name" data-player-id="you" value="You" placeholder="名前を入力">
+          <label>東家:</label>
+          <input type="text" class="player-name" id="player1-name" data-player-id="you" value="player1" placeholder="名前を入力">
         </div>
         <div class="player-name-container">
-          <label>プレイヤー2:</label>
-          <input type="text" class="player-name" id="player2-name" data-player-id="takeda" value="武田" placeholder="名前を入力">
+          <label>南家:</label>
+          <input type="text" class="player-name" id="player2-name" data-player-id="takeda" value="player2" placeholder="名前を入力">
         </div>
         <div class="player-name-container">
-          <label>プレイヤー3:</label>
-          <input type="text" class="player-name" id="player3-name" data-player-id="ishie" value="石江" placeholder="名前を入力">
+          <label>西家:</label>
+          <input type="text" class="player-name" id="player3-name" data-player-id="ishie" value="player3" placeholder="名前を入力">
         </div>
         <div class="player-name-container">
-          <label>プレイヤー4:</label>
-          <input type="text" class="player-name" id="player4-name" data-player-id="miura" value="三浦" placeholder="名前を入力">
+          <label>北家:</label>
+          <input type="text" class="player-name" id="player4-name" data-player-id="miura" value="player4" placeholder="名前を入力">
         </div>
       </div>
     <div class="container">
@@ -1080,10 +1183,13 @@ label {
 
         <!-- 順位入力部分 -->
         <h3>第<span id="currentHanchan">1</span>半荘</h3>
+        <div class="points-hint" style="color: #888; margin-bottom: 10px; font-size: 0.9em;">
+            ※持ち点/1000を入力してください（例：35000点だった場合35）
+        </div>
         
         <div id="you-row" class="player-row">
-            <span>You</span>
-            <input type="number" class="points-input" id="you-points" placeholder="ポイント" min="-100" max="100">
+            <span>player1</span>
+            <input type="number" class="points-input" id="you-points" placeholder="持ち点(例:35)" min="-25" max="100">
             <button class="rank-button" onclick="selectRank('you', 1)">1位</button>
             <button class="rank-button" onclick="selectRank('you', 2)">2位</button>
             <button class="rank-button" onclick="selectRank('you', 3)">3位</button>
@@ -1092,8 +1198,8 @@ label {
         
         <!-- 他のプレイヤーの順位入力部分 -->
         <div id="takeda-row" class="player-row">
-            <span>武田</span>
-            <input type="number" class="points-input" id="takeda-points" placeholder="ポイント" min="-100" max="100">
+            <span>player2</span>
+            <input type="number" class="points-input" id="takeda-points" placeholder="持ち点" min="-25" max="100">
             <button class="rank-button" onclick="selectRank('takeda', 1)">1位</button>
             <button class="rank-button" onclick="selectRank('takeda', 2)">2位</button>
             <button class="rank-button" onclick="selectRank('takeda', 3)">3位</button>
@@ -1101,8 +1207,8 @@ label {
         </div>
         
         <div id="ishie-row" class="player-row">
-            <span>石江</span>
-            <input type="number" class="points-input" id="ishie-points" placeholder="ポイント" min="-100" max="100">
+            <span>player3</span>
+            <input type="number" class="points-input" id="ishie-points" placeholder="持ち点" min="-25" max="100">
             <button class="rank-button" onclick="selectRank('ishie', 1)">1位</button>
             <button class="rank-button" onclick="selectRank('ishie', 2)">2位</button>
             <button class="rank-button" onclick="selectRank('ishie', 3)">3位</button>
@@ -1110,8 +1216,8 @@ label {
         </div>
         
         <div id="miura-row" class="player-row">
-            <span>三浦</span>
-            <input type="number" class="points-input" id="miura-points" placeholder="ポイント" min="-100" max="100">
+            <span>player4</span>
+            <input type="number" class="points-input" id="miura-points" placeholder="持ち点" min="-25" max="100">
             <button class="rank-button" onclick="selectRank('miura', 1)">1位</button>
             <button class="rank-button" onclick="selectRank('miura', 2)">2位</button>
             <button class="rank-button" onclick="selectRank('miura', 3)">3位</button>
@@ -1134,7 +1240,7 @@ label {
             <div class="section-title">合計和了・放銃回数</div>
             <div class="total-stats-grid">
                 <div class="total-stats-row">
-                    <span class="player-name">You</span>
+                    <span class="player-name">player1</span>
                     <div class="input-group">
                         <label>和了回数</label>
                         <input type="number" id="you-total-agari" value="0" min="0" onchange="updateTotalStats()">
@@ -1146,7 +1252,7 @@ label {
                 </div>
                 <!-- 他のプレイヤー分も同様に -->
                 <div class="total-stats-row">
-                    <span class="player-name">武田</span>
+                    <span class="player-name">player2</span>
                     <div class="input-group">
                         <label>和了回数</label>
                         <input type="number" id="takeda-total-agari" value="0" min="0" onchange="updateTotalStats()">
@@ -1157,7 +1263,7 @@ label {
                     </div>
                 </div>
                 <div class="total-stats-row">
-                    <span class="player-name">石江</span>
+                    <span class="player-name">player3</span>
                     <div class="input-group">
                         <label>和了回数</label>
                         <input type="number" id="ishie-total-agari" value="0" min="0" onchange="updateTotalStats()">
@@ -1168,7 +1274,7 @@ label {
                     </div>
                 </div>
                 <div class="total-stats-row">
-                    <span class="player-name">三浦</span>
+                    <span class="player-name">player4</span>
                     <div class="input-group">
                         <label>和了回数</label>
                         <input type="number" id="miura-total-agari" value="0" min="0" onchange="updateTotalStats()">
@@ -1191,10 +1297,10 @@ label {
                 <!-- ヘッダー行（プレイヤー名） -->
                 <div class="stats-row stats-header">
                     <div class="metric-name">指標</div>
-                    <div class="stats-cell">You</div>
-                    <div class="stats-cell">武田</div>
-                    <div class="stats-cell">石江</div>
-                    <div class="stats-cell">三浦</div>
+                    <div class="stats-cell">player1</div>
+                    <div class="stats-cell">player2</div>
+                    <div class="stats-cell">player3</div>
+                    <div class="stats-cell">player4</div>
                 </div>
     
                 <!-- 各指標の行 -->
@@ -1221,6 +1327,30 @@ label {
                     <div class="stats-cell" id="ishie-top-count">0</div>
                     <div class="stats-cell" id="miura-top-count">0</div>
                 </div>
+
+                <div class="stats-row">
+                    <div class="metric-name">2着回数</div>
+                    <div class="stats-cell" id="you-second-count">0</div>
+                    <div class="stats-cell" id="takeda-second-count">0</div>
+                    <div class="stats-cell" id="ishie-second-count">0</div>
+                    <div class="stats-cell" id="miura-second-count">0</div>
+                </div>
+
+                <div class="stats-row">
+                    <div class="metric-name">3着回数</div>
+                    <div class="stats-cell" id="you-third-count">0</div>
+                    <div class="stats-cell" id="takeda-third-count">0</div>
+                    <div class="stats-cell" id="ishie-third-count">0</div>
+                    <div class="stats-cell" id="miura-third-count">0</div>
+                </div>
+
+                <div class="stats-row">
+                    <div class="metric-name">ラス回数</div>
+                    <div class="stats-cell" id="you-four-count">0</div>
+                    <div class="stats-cell" id="takeda-four-count">0</div>
+                    <div class="stats-cell" id="ishie-four-count">0</div>
+                    <div class="stats-cell" id="miura-four-count">0</div>
+                </div>
     
                 <div class="stats-row">
                     <div class="metric-name">トップ率</div>
@@ -1228,6 +1358,52 @@ label {
                     <div class="stats-cell" id="takeda-top-rate">0%</div>
                     <div class="stats-cell" id="ishie-top-rate">0%</div>
                     <div class="stats-cell" id="miura-top-rate">0%</div>
+                </div>
+
+                
+        
+                <div class="stats-row">
+                    <div class="metric-name">2着率</div>
+                    <div class="stats-cell" id="you-second-rate">0%</div>
+                    <div class="stats-cell" id="takeda-second-rate">0%</div>
+                    <div class="stats-cell" id="ishie-second-rate">0%</div>
+                    <div class="stats-cell" id="miura-second-rate">0%</div>
+                </div>
+        
+                
+        
+                <div class="stats-row">
+                    <div class="metric-name">3着率</div>
+                    <div class="stats-cell" id="you-third-rate">0%</div>
+                    <div class="stats-cell" id="takeda-third-rate">0%</div>
+                    <div class="stats-cell" id="ishie-third-rate">0%</div>
+                    <div class="stats-cell" id="miura-third-rate">0%</div>
+                </div>
+        
+                
+        
+                <div class="stats-row">
+                    <div class="metric-name">ラス率</div>
+                    <div class="stats-cell" id="you-four-rate">0%</div>
+                    <div class="stats-cell" id="takeda-four-rate">0%</div>
+                    <div class="stats-cell" id="ishie-four-rate">0%</div>
+                    <div class="stats-cell" id="miura-four-rate">0%</div>
+                </div>
+
+                <div class="stats-row">
+                    <div class="metric-name">ラス回避率</div>
+                    <div class="stats-cell" id="you-notfour-rate">0%</div>
+                    <div class="stats-cell" id="takeda-notfour-rate">0%</div>
+                    <div class="stats-cell" id="ishie-notfour-rate">0%</div>
+                    <div class="stats-cell" id="miura-notfour-rate">0%</div>
+                </div>
+
+                <div class="stats-row">
+                    <div class="metric-name">連対率</div>
+                    <div class="stats-cell" id="you-rentai-rate">0%</div>
+                    <div class="stats-cell" id="takeda-rentai-rate">0%</div>
+                    <div class="stats-cell" id="ishie-rentai-rate">0%</div>
+                    <div class="stats-cell" id="miura-rentai-rate">0%</div>
                 </div>
     
                 <div class="stats-row">
@@ -1509,9 +1685,12 @@ label {
 
     const completedHanchan = results.length;
     const topCount = results.filter(result => result[player] === 1).length;
+    const secondCount = results.filter(result => result[player] === 2).length;
+    const thirdCount = results.filter(result => result[player] === 3).length;
+    const fourCount = results.filter(result => result[player] === 4).length;
     
     // 素ポイントと順位ポイントの計算
-    const rawPoints = pointsHistory.map(points => points[player]);
+    const rawPoints = pointsHistory.map(points => points[player] - 30000 /1000);
     const totalRawPoints = rawPoints.reduce((a, b) => a + b, 0);
     const rankPoints = results.map(result => calculateRankPoints(result[player]));
     const totalRankPoints = rankPoints.reduce((a, b) => a + b, 0);
@@ -1528,6 +1707,16 @@ label {
     updateElement(`${player}-games`, totalGames);
     updateElement(`${player}-top-count`, topCount);
     updateElement(`${player}-top-rate`, ((topCount / completedHanchan) * 100).toFixed(1) + '%');
+    updateElement(`${player}-second-count`, secondCount);
+    updateElement(`${player}-second-rate`, ((secondCount / completedHanchan) * 100).toFixed(1) + '%');
+    updateElement(`${player}-third-count`, thirdCount);
+    updateElement(`${player}-third-rate`, ((thirdCount / completedHanchan) * 100).toFixed(1) + '%');
+    updateElement(`${player}-four-count`, fourCount);
+    updateElement(`${player}-four-rate`, ((fourCount / completedHanchan) * 100).toFixed(1) + '%');
+    updateElement(`${player}-rentai-rate`, (((topCount + secondCount) / completedHanchan) * 100).toFixed(1) + '%');
+    updateElement(`${player}-notfour-rate`, (((topCount + secondCount + thirdCount) / completedHanchan) * 100).toFixed(1) + '%');
+    
+
     
     // 和了率と放銃率の更新
     if (totalGames > 0) {
@@ -1644,10 +1833,10 @@ label {
 }
     function calculateRankPoints(rank) {
         switch(rank) {
-            case 1: return 45;
-            case 2: return 5;
-            case 3: return -15;
-            case 4: return -35;
+            case 1: return 50;
+            case 2: return 10;
+            case 3: return -10;
+            case 4: return -30;
             default: return 0;
         }
     }
@@ -1657,7 +1846,7 @@ label {
             const points = parseInt(value);
             if (isNaN(points)) return false;
             // 一般的な点数範囲のチェック（例：0から100000点）
-            return points >= -100 && points <= 100;
+            return points <= 100000;
         }
 
 
@@ -1771,10 +1960,10 @@ function initializeChart() {
 
     // プレイヤー名を取得
     const playerNames = {
-        you: document.querySelector('#player1-name')?.value || 'You',
-        takeda: document.querySelector('#player2-name')?.value || '武田',
-        ishie: document.querySelector('#player3-name')?.value || '石江',
-        miura: document.querySelector('#player4-name')?.value || '三浦'
+        you: document.querySelector('#player1-name')?.value || 'player1',
+        takeda: document.querySelector('#player2-name')?.value || 'player2',
+        ishie: document.querySelector('#player3-name')?.value || 'player3',
+        miura: document.querySelector('#player4-name')?.value || 'player4'
     };
 
     // テレビ放送風のカラーパレット
@@ -2351,6 +2540,9 @@ function updatePlayerName(input) {
        {key: 'deal-in-rate', type: 'min'},
        {key: 'avg-rank', type: 'min'},
        {key: 'top-rate', type: 'max'},
+       {key: 'four-rate', type: 'min'},
+       {key: 'rentai-rate', type: 'max'},
+       {key: 'notfour-rate', type: 'max'},
        {key: 'raw-points', type: 'max'},    // 素点は高いほうが良い
        {key: 'rank-points', type: 'max'}     // 順位Pは高いほうが良い
    ];
@@ -2383,48 +2575,99 @@ function updatePlayerName(input) {
 //        }
 //    });
 
+    // metrics.forEach(metric => {
+    //         let bestValue = metric.type === 'max' ? -Infinity : Infinity;
+    //         let bestPlayer = null;
+
+    //         players.forEach(player => {
+    //             const element = document.getElementById(`${player}-${metric.key}`);
+    //             if (!element) return;
+
+    //             const value = parseFloat(element.textContent.replace('%', ''));
+    //             if (isNaN(value)) return;
+
+    //             if ((metric.type === 'max' && value > bestValue) || 
+    //                 (metric.type === 'min' && value < bestValue)) {
+    //                 bestValue = value;
+    //                 bestPlayer = player;
+    //             }
+    //         });
+
+    //         // 以前のハイライトを削除
+    //         players.forEach(player => {
+    //             const element = document.getElementById(`${player}-${metric.key}`);
+    //             if (element) {
+    //                 element.removeAttribute('data-highlight');
+    //                 element.style.background = '';
+    //             }
+    //         });
+
+    //         // 新しいハイライトを適用
+    //         if (bestPlayer) {
+    //             const element = document.getElementById(`${bestPlayer}-${metric.key}`);
+    //             if (element) {
+    //                 element.setAttribute('data-highlight', 'true');
+    //                 element.style.background = '#006937';
+    //                 element.style.color = 'white';
+
+    //                 if (element.tagName.toLowerCase() === 'input') {
+    //                 element.style.color = 'white';
+    //                 element.style.borderColor = '#006937';
+    //             }
+    //             }
+    //         }
+    //     });
+
     metrics.forEach(metric => {
-            let bestValue = metric.type === 'max' ? -Infinity : Infinity;
-            let bestPlayer = null;
+        // 以前のハイライトを削除
+        players.forEach(player => {
+            const element = document.getElementById(`${player}-${metric.key}`);
+            if (element) {
+                element.removeAttribute('data-highlight');
+                element.style.background = '';
+                element.style.color = '';
+            }
+        });
 
-            players.forEach(player => {
+        // 各プレイヤーの値を取得
+        const values = [];
+        players.forEach(player => {
+            const element = document.getElementById(`${player}-${metric.key}`);
+            if (!element) return;
+
+            const value = parseFloat(element.textContent.replace('%', ''));
+            if (isNaN(value)) return;
+            
+            values.push({player, value});
+        });
+
+        // 値が取得できない場合はスキップ
+        if (values.length === 0) return;
+
+        // 最高値または最低値を見つける
+        let bestValue = metric.type === 'max' ? 
+            Math.max(...values.map(v => v.value)) : 
+            Math.min(...values.map(v => v.value));
+
+        // 最高値または最低値に一致する全てのプレイヤーを強調表示
+        values.forEach(({player, value}) => {
+            if ((metric.type === 'max' && value === bestValue) || 
+                (metric.type === 'min' && value === bestValue)) {
+                
                 const element = document.getElementById(`${player}-${metric.key}`);
-                if (!element) return;
-
-                const value = parseFloat(element.textContent.replace('%', ''));
-                if (isNaN(value)) return;
-
-                if ((metric.type === 'max' && value > bestValue) || 
-                    (metric.type === 'min' && value < bestValue)) {
-                    bestValue = value;
-                    bestPlayer = player;
-                }
-            });
-
-            // 以前のハイライトを削除
-            players.forEach(player => {
-                const element = document.getElementById(`${player}-${metric.key}`);
-                if (element) {
-                    element.removeAttribute('data-highlight');
-                    element.style.background = '';
-                }
-            });
-
-            // 新しいハイライトを適用
-            if (bestPlayer) {
-                const element = document.getElementById(`${bestPlayer}-${metric.key}`);
                 if (element) {
                     element.setAttribute('data-highlight', 'true');
                     element.style.background = '#006937';
                     element.style.color = 'white';
 
                     if (element.tagName.toLowerCase() === 'input') {
-                    element.style.color = 'white';
-                    element.style.borderColor = '#006937';
-                }
+                        element.style.color = 'white';
+                        element.style.borderColor = '#006937';
+                    }
                 }
             }
         });
+    });
 }
 
     // プレイヤーの列インデックスを取得する補助関数
@@ -2533,6 +2776,40 @@ function applyLoadedData(gameData) {
         'player4-name': { value: gameData.playerNames.miura, id: 'miura' }
     };
 
+    // 5. 入力フィールドの更新とヒントの表示
+function updatePointsInputConstraints() {
+    const players = ['you', 'takeda', 'ishie', 'miura'];
+    players.forEach(player => {
+        const input = document.getElementById(`${player}-points`);
+        if (input) {
+            input.min = "-25000";
+            input.max = "100000";
+            input.placeholder = "点数(例:35000)";
+        }
+    });
+
+    // 入力フィールドの横にヒントを追加
+    const pointsHint = document.createElement('div');
+    pointsHint.className = 'points-hint';
+    pointsHint.innerHTML = '※点数をそのまま入力してください（例：25000～40000点程度）';
+    pointsHint.style.color = '#888';
+    pointsHint.style.fontSize = '0.85em';
+    pointsHint.style.marginTop = '5px';
+    
+    const pointsInputs = document.querySelectorAll('.points-input');
+    if (pointsInputs.length > 0) {
+        const firstInput = pointsInputs[0];
+        if (firstInput.parentNode && !document.querySelector('.points-hint')) {
+            firstInput.parentNode.appendChild(pointsHint);
+        }
+    }
+
+    // ページ読み込み時に実行
+    document.addEventListener('DOMContentLoaded', function() {
+        updatePointsInputConstraints();
+    });
+    }
+
     // 各プレイヤーの名前を更新
     Object.entries(playerInputs).forEach(([inputId, data]) => {
         const input = document.getElementById(inputId);
@@ -2627,6 +2904,14 @@ function exportStatsToCSV() {
             ['総対局数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-games`).textContent)],
             ['トップ回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-top-count`).textContent)],
             ['トップ率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-top-rate`).textContent)],
+            ['２着回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-second-count`).textContent)],
+            ['２着率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-second-rate`).textContent)],
+            ['３着回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-third-count`).textContent)],
+            ['３着率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-third-rate`).textContent)],
+            ['ラス回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-four-count`).textContent)],
+            ['ラス率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-four-rate`).textContent)],
+            ['連対率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-rentai-rate`).textContent)],
+            ['ラス回避率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-notfour-rate`).textContent)],
             ['和了回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-agari`).value)],
             ['和了率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-agari-rate`).textContent)],
             ['放銃回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-deal-in`).value)],
@@ -2734,6 +3019,14 @@ function generateBasicStatsTable(playerNames) {
         ['総対局数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-games`).textContent)],
         ['トップ回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-top-count`).textContent)],
         ['トップ率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-top-rate`).textContent)],
+        ['２着回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-second-count`).textContent)],
+        ['２着率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-second-rate`).textContent)],
+        ['３着回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-third-count`).textContent)],
+        ['３着率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-third-rate`).textContent)],
+        ['ラス回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-four-count`).textContent)],
+        ['ラス率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-four-rate`).textContent)],
+        ['連対率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-rentai-rate`).textContent)],
+        ['ラス回避率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-notfour-rate`).textContent)],
         ['和了回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-agari`).value)],
         ['和了率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-agari-rate`).textContent)],
         ['放銃回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-deal-in`).value)],
@@ -2771,6 +3064,14 @@ function generateBasicStatsCSV(playerNames) {
         ['総対局数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-games`).textContent)],
         ['トップ回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-top-count`).textContent)],
         ['トップ率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-top-rate`).textContent)],
+        ['２着回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-second-count`).textContent)],
+        ['２着率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-second-rate`).textContent)],
+        ['３着回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-third-count`).textContent)],
+        ['３着率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-third-rate`).textContent)],
+        ['ラス回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-four-count`).textContent)],
+        ['ラス率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-four-rate`).textContent)],
+        ['連対率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-rentai-rate`).textContent)],
+        ['ラス回避率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-notfour-rate`).textContent)],
         ['和了回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-agari`).value)],
         ['和了率', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-agari-rate`).textContent)],
         ['放銃回数', ...['you', 'takeda', 'ishie', 'miura'].map(p => document.getElementById(`${p}-deal-in`).value)],
