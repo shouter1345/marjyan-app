@@ -1089,6 +1089,98 @@ label {
         }
     }
 
+    .player-name-container {
+        position: relative;
+    }
+
+    .player-name-controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 5px;
+        align-items: center;
+    }
+
+    .save-name-btn {
+        background: linear-gradient(45deg, #007AFF, #00A3FF);
+        color: white;
+        border: none;
+        padding: 4px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9em;
+        transition: all 0.2s;
+    }
+
+    .save-name-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 5px rgba(0, 122, 255, 0.3);
+    }
+
+    .player-name-dropdown {
+        background: #2a2a2a;
+        color: white;
+        border: 1px solid #444;
+        padding: 4px 10px;
+        border-radius: 4px;
+        min-width: 150px;
+    }
+
+    .player-name-dropdown option {
+        background: #2a2a2a;
+        color: white;
+    }
+
+    .save-success {
+        position: absolute;
+        right: 10px;
+        top: -10px;
+        background: #4CAF50;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8em;
+        animation: fadeInOut 3s;
+    }
+
+    @keyframes fadeInOut {
+        0% { opacity: 0; }
+        15% { opacity: 1; }
+        85% { opacity: 1; }
+        100% { opacity: 0; }
+    }
+
+    .name-management-section {
+        margin-top: 20px;
+    }
+
+    .name-list-container {
+        display: flex;
+        gap: 20px;
+        margin-top: 15px;
+    }
+
+    .saved-names-list {
+        flex: 1;
+        background: #2a2a2a;
+        color: white;
+        border: 1px solid #444;
+        padding: 10px;
+        border-radius: 6px;
+        min-height: 150px;
+    }
+
+    .saved-names-list option {
+        padding: 5px;
+        border-bottom: 1px solid #444;
+    }
+
+    .name-management-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        justify-content: center;
+    }
+
 </style>
 <!-- プレイヤー行のHTML構造を修正 -->
 <template id="player-row-template">
@@ -1664,6 +1756,234 @@ label {
     //         document.getElementById(`${player}-points-details`).innerHTML = pointsDetails;
     //     }
     // }
+
+    // 保存された名前のリストを管理する
+    function savePlayerNameToGlobalList(name) {
+        if (!name || name.trim() === '') return; // 空の名前は保存しない
+        
+        // ローカルストレージから名前リストを取得
+        let savedNames = localStorage.getItem('savedPlayerNames');
+        let namesList = savedNames ? JSON.parse(savedNames) : [];
+        
+        // 既にリストにある場合は追加しない
+        if (!namesList.includes(name)) {
+            namesList.push(name);
+            // 名前を五十音順またはアルファベット順に並べ替え
+            namesList.sort();
+            // ローカルストレージに保存
+            localStorage.setItem('savedPlayerNames', JSON.stringify(namesList));
+        }
+        
+        // すべてのドロップダウンリストを更新
+        updateAllPlayerNameDropdowns();
+    }
+
+    // すべてのプレイヤー名ドロップダウンリストを更新
+    function updateAllPlayerNameDropdowns() {
+        for (let i = 1; i <= 4; i++) {
+            updatePlayerNameDropdown(i);
+        }
+    }
+
+    // 指定したプレイヤー番号のドロップダウンリストを更新
+    function updatePlayerNameDropdown(playerNum) {
+        // ドロップダウンメニューの要素を取得
+        const dropdown = document.getElementById(`player${playerNum}-dropdown`);
+        
+        // 保存された名前リストを取得
+        let savedNames = localStorage.getItem('savedPlayerNames');
+        let namesList = savedNames ? JSON.parse(savedNames) : [];
+        
+        // 現在の選択肢をクリア
+        dropdown.innerHTML = '<option value="">登録済みプレイヤー</option>';
+        
+        // 名前リストからドロップダウンの選択肢を作成
+        namesList.forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            dropdown.appendChild(option);
+        });
+    }
+
+    // プレイヤー入力フォームに保存機能とドロップダウンを追加
+    function enhancePlayerInputForms() {
+        const playerInputContainers = document.querySelectorAll('.player-name-container');
+        
+        playerInputContainers.forEach((container, index) => {
+            const playerNum = index + 1;
+            const nameInput = container.querySelector('.player-name');
+            
+            // 入力コントロールのコンテナを作成
+            const controlsContainer = document.createElement('div');
+            controlsContainer.className = 'player-name-controls';
+            
+            // 名前保存ボタンを作成
+            const saveButton = document.createElement('button');
+            saveButton.className = 'save-name-btn';
+            saveButton.textContent = '保存';
+            saveButton.title = 'この名前を保存リストに追加';
+            saveButton.onclick = function() {
+                const name = nameInput.value.trim();
+                if (name) {
+                    savePlayerNameToGlobalList(name);
+                    // 保存成功メッセージ
+                    showNameSavedMessage(container);
+                }
+            };
+            
+            // ドロップダウンリストを作成
+            const dropdown = document.createElement('select');
+            dropdown.className = 'player-name-dropdown';
+            dropdown.id = `player${playerNum}-dropdown`;
+            dropdown.onchange = function() {
+                if (this.value) {
+                    nameInput.value = this.value;
+                    // 変更を反映
+                    updatePlayerName(nameInput);
+                    // 選択後はデフォルトオプションに戻す
+                    this.selectedIndex = 0;
+                }
+            };
+            
+            // 初期オプションを追加
+            dropdown.innerHTML = '<option value="">登録済みプレイヤー</option>';
+            
+            // コントロールをコンテナに追加
+            controlsContainer.appendChild(dropdown);
+            controlsContainer.appendChild(saveButton);
+            
+            // コンテナを入力欄の後に挿入
+            container.appendChild(controlsContainer);
+        });
+        
+        // すべてのドロップダウンを初期化
+        updateAllPlayerNameDropdowns();
+    }
+
+    // 保存成功メッセージを表示
+    function showNameSavedMessage(container) {
+        // 既存のメッセージがあれば削除
+        const existingMsg = container.querySelector('.save-success');
+        if (existingMsg) {
+            existingMsg.remove();
+        }
+        
+        // 新しいメッセージを作成
+        const msg = document.createElement('div');
+        msg.className = 'save-success';
+        msg.textContent = '保存しました！';
+        container.appendChild(msg);
+        
+        // 3秒後にメッセージを消す
+        setTimeout(() => {
+            msg.remove();
+        }, 3000);
+    }
+
+    // 登録名前管理セクションを追加
+    function addNameManagementSection() {
+        // 名前管理セクションのコンテナを作成
+        const nameManagementSection = document.createElement('div');
+        nameManagementSection.className = 'name-management-section setup-section';
+        nameManagementSection.innerHTML = `
+            <div class="section-title">プレイヤー名リスト管理</div>
+            <div class="name-list-container">
+                <select id="saved-names-list" multiple size="6" class="saved-names-list">
+                    <!-- ここに保存された名前が表示される -->
+                </select>
+                <div class="name-management-controls">
+                    <button id="delete-selected-name" class="player-tab">選択した名前を削除</button>
+                    <button id="clear-all-names" class="player-tab">すべての名前を削除</button>
+                </div>
+            </div>
+        `;
+        
+        // 名前管理セクションをプレイヤー入力セクションの後に挿入
+        const setupSection = document.querySelector('.setup-section');
+        setupSection.parentNode.insertBefore(nameManagementSection, setupSection.nextSibling);
+        
+        // 保存された名前リストを表示
+        updateSavedNamesList();
+        
+        // イベントリスナーを設定
+        document.getElementById('delete-selected-name').addEventListener('click', deleteSelectedName);
+        document.getElementById('clear-all-names').addEventListener('click', clearAllNames);
+    }
+
+    // 保存された名前リストを更新
+    function updateSavedNamesList() {
+        const nameList = document.getElementById('saved-names-list');
+        if (!nameList) return;
+        
+        // リストをクリア
+        nameList.innerHTML = '';
+        
+        // 保存された名前を取得
+        let savedNames = localStorage.getItem('savedPlayerNames');
+        let namesList = savedNames ? JSON.parse(savedNames) : [];
+        
+        // リストに名前を追加
+        namesList.forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            nameList.appendChild(option);
+        });
+        
+        // 名前がない場合のメッセージ
+        if (namesList.length === 0) {
+            const option = document.createElement('option');
+            option.disabled = true;
+            option.textContent = '保存された名前はありません';
+            nameList.appendChild(option);
+        }
+    }
+
+    // 選択された名前を削除
+    function deleteSelectedName() {
+        const nameList = document.getElementById('saved-names-list');
+        const selectedOptions = Array.from(nameList.selectedOptions);
+        
+        if (selectedOptions.length === 0) {
+            alert('削除する名前を選択してください');
+            return;
+        }
+        
+        // 保存された名前を取得
+        let savedNames = localStorage.getItem('savedPlayerNames');
+        let namesList = savedNames ? JSON.parse(savedNames) : [];
+        
+        // 選択された名前を削除
+        selectedOptions.forEach(option => {
+            const index = namesList.indexOf(option.value);
+            if (index !== -1) {
+                namesList.splice(index, 1);
+            }
+        });
+        
+        // 更新されたリストを保存
+        localStorage.setItem('savedPlayerNames', JSON.stringify(namesList));
+        
+        // リストとドロップダウンを更新
+        updateSavedNamesList();
+        updateAllPlayerNameDropdowns();
+    }
+
+    // すべての名前を削除
+    function clearAllNames() {
+        if (confirm('すべての保存された名前を削除しますか？')) {
+            localStorage.removeItem('savedPlayerNames');
+            updateSavedNamesList();
+            updateAllPlayerNameDropdowns();
+        }
+    }
+
+    // ページ読み込み時に実行
+    document.addEventListener('DOMContentLoaded', function() {
+        enhancePlayerInputForms();
+        addNameManagementSection();
+    });
 
     function updateStats(player) {
     // 和了・放銃回数の取得と更新
