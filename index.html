@@ -1,168 +1,255 @@
-import numpy as np
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 
-class Matrix4x4:
-    def __init__(self, matrix=None):
-        """4x4行列を初期化"""
-        if matrix is None:
-            self.matrix = np.zeros((4, 4))
-        else:
-            self.matrix = np.array(matrix)
-            if self.matrix.shape != (4, 4):
-                raise ValueError("行列は4x4である必要があります")
-    
-    def __str__(self):
-        """行列を見やすい形で表示"""
-        result = ""
-        for row in self.matrix:
-            result += "[ " + " ".join(f"{x:8.2f}" for x in row) + " ]\n"
-        return result
-    
-    def add(self, other):
-        """行列の加算"""
-        if isinstance(other, Matrix4x4):
-            return Matrix4x4(self.matrix + other.matrix)
-        else:
-            raise TypeError("Matrix4x4オブジェクトが必要です")
-    
-    def subtract(self, other):
-        """行列の減算"""
-        if isinstance(other, Matrix4x4):
-            return Matrix4x4(self.matrix - other.matrix)
-        else:
-            raise TypeError("Matrix4x4オブジェクトが必要です")
-    
-    def multiply(self, other):
-        """行列の乗算"""
-        if isinstance(other, Matrix4x4):
-            return Matrix4x4(np.dot(self.matrix, other.matrix))
-        elif isinstance(other, (int, float)):
-            # スカラー倍
-            return Matrix4x4(self.matrix * other)
-        else:
-            raise TypeError("Matrix4x4オブジェクトまたは数値が必要です")
-    
-    def transpose(self):
-        """行列の転置"""
-        return Matrix4x4(self.matrix.T)
-    
-    def determinant(self):
-        """行列式の計算"""
-        return np.linalg.det(self.matrix)
-    
-    def inverse(self):
-        """逆行列の計算"""
-        try:
-            return Matrix4x4(np.linalg.inv(self.matrix))
-        except np.linalg.LinAlgError:
-            raise ValueError("この行列は逆行列を持ちません（特異行列）")
-    
-    def trace(self):
-        """対角和（トレース）の計算"""
-        return np.trace(self.matrix)
+#define SIZE 4
 
-# 使用例とテスト
-def main():
-    print("=== 4x4行列計算プログラム ===\n")
+// 4x4行列の型定義
+typedef double Matrix4x4[SIZE][SIZE];
+
+// 関数プロトタイプ
+void print_matrix(Matrix4x4 matrix, const char* name);
+void add_matrices(Matrix4x4 a, Matrix4x4 b, Matrix4x4 result);
+void subtract_matrices(Matrix4x4 a, Matrix4x4 b, Matrix4x4 result);
+void multiply_matrices(Matrix4x4 a, Matrix4x4 b, Matrix4x4 result);
+void scalar_multiply(Matrix4x4 matrix, double scalar, Matrix4x4 result);
+void transpose_matrix(Matrix4x4 matrix, Matrix4x4 result);
+double determinant_4x4(Matrix4x4 matrix);
+double determinant_3x3(double matrix[3][3]);
+int inverse_matrix(Matrix4x4 matrix, Matrix4x4 result);
+double trace_matrix(Matrix4x4 matrix);
+void copy_matrix(Matrix4x4 src, Matrix4x4 dest);
+void identity_matrix(Matrix4x4 matrix);
+
+// 行列を表示する関数
+void print_matrix(Matrix4x4 matrix, const char* name) {
+    printf("%s:\n", name);
+    for (int i = 0; i < SIZE; i++) {
+        printf("[ ");
+        for (int j = 0; j < SIZE; j++) {
+            printf("%8.2f ", matrix[i][j]);
+        }
+        printf("]\n");
+    }
+    printf("\n");
+}
+
+// 行列の加算
+void add_matrices(Matrix4x4 a, Matrix4x4 b, Matrix4x4 result) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            result[i][j] = a[i][j] + b[i][j];
+        }
+    }
+}
+
+// 行列の減算
+void subtract_matrices(Matrix4x4 a, Matrix4x4 b, Matrix4x4 result) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            result[i][j] = a[i][j] - b[i][j];
+        }
+    }
+}
+
+// 行列の乗算
+void multiply_matrices(Matrix4x4 a, Matrix4x4 b, Matrix4x4 result) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            result[i][j] = 0;
+            for (int k = 0; k < SIZE; k++) {
+                result[i][j] += a[i][k] * b[k][j];
+            }
+        }
+    }
+}
+
+// スカラー倍
+void scalar_multiply(Matrix4x4 matrix, double scalar, Matrix4x4 result) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            result[i][j] = matrix[i][j] * scalar;
+        }
+    }
+}
+
+// 転置行列
+void transpose_matrix(Matrix4x4 matrix, Matrix4x4 result) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            result[j][i] = matrix[i][j];
+        }
+    }
+}
+
+// 3x3行列の行列式
+double determinant_3x3(double matrix[3][3]) {
+    return matrix[0][0] * (matrix[1][1] * matrix[2][2] - matrix[1][2] * matrix[2][1])
+         - matrix[0][1] * (matrix[1][0] * matrix[2][2] - matrix[1][2] * matrix[2][0])
+         + matrix[0][2] * (matrix[1][0] * matrix[2][1] - matrix[1][1] * matrix[2][0]);
+}
+
+// 4x4行列の行列式
+double determinant_4x4(Matrix4x4 matrix) {
+    double det = 0;
+    double submatrix[3][3];
+    int sign = 1;
     
-    # サンプル行列の作成
-    matrix_a = Matrix4x4([
-        [1, 2, 3, 4],
-        [5, 6, 7, 8],
-        [9, 10, 11, 12],
-        [13, 14, 15, 16]
-    ])
-    
-    matrix_b = Matrix4x4([
-        [2, 0, 1, 3],
-        [1, 1, 0, 2],
-        [0, 1, 2, 1],
-        [1, 0, 1, 1]
-    ])
-    
-    print("行列 A:")
-    print(matrix_a)
-    
-    print("行列 B:")
-    print(matrix_b)
-    
-    # 加算
-    print("A + B:")
-    result_add = matrix_a.add(matrix_b)
-    print(result_add)
-    
-    # 減算
-    print("A - B:")
-    result_sub = matrix_a.subtract(matrix_b)
-    print(result_sub)
-    
-    # 乗算
-    print("A × B:")
-    result_mul = matrix_a.multiply(matrix_b)
-    print(result_mul)
-    
-    # スカラー倍
-    print("A × 2:")
-    result_scalar = matrix_a.multiply(2)
-    print(result_scalar)
-    
-    # 転置
-    print("A の転置:")
-    result_transpose = matrix_a.transpose()
-    print(result_transpose)
-    
-    # 行列式
-    print(f"A の行列式: {matrix_a.determinant():.2f}")
-    print(f"B の行列式: {matrix_b.determinant():.2f}")
-    
-    # トレース
-    print(f"A のトレース: {matrix_a.trace()}")
-    print(f"B のトレース: {matrix_b.trace()}")
-    
-    # 逆行列（Bで試す）
-    try:
-        print("B の逆行列:")
-        result_inverse = matrix_b.inverse()
-        print(result_inverse)
+    for (int col = 0; col < SIZE; col++) {
+        // 余因子行列を作成
+        int sub_i = 0;
+        for (int i = 1; i < SIZE; i++) {
+            int sub_j = 0;
+            for (int j = 0; j < SIZE; j++) {
+                if (j != col) {
+                    submatrix[sub_i][sub_j] = matrix[i][j];
+                    sub_j++;
+                }
+            }
+            sub_i++;
+        }
         
-        # 検証: B × B^(-1) = I
-        print("検証 B × B^(-1):")
-        identity_check = matrix_b.multiply(result_inverse)
-        print(identity_check)
+        det += sign * matrix[0][col] * determinant_3x3(submatrix);
+        sign = -sign;
+    }
+    
+    return det;
+}
+
+// 逆行列の計算
+int inverse_matrix(Matrix4x4 matrix, Matrix4x4 result) {
+    double det = determinant_4x4(matrix);
+    
+    if (fabs(det) < 1e-10) {
+        printf("エラー: 行列は特異行列です（逆行列が存在しません）\n");
+        return 0;
+    }
+    
+    // 余因子行列を計算
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            double submatrix[3][3];
+            int sub_i = 0;
+            
+            for (int row = 0; row < SIZE; row++) {
+                if (row != i) {
+                    int sub_j = 0;
+                    for (int col = 0; col < SIZE; col++) {
+                        if (col != j) {
+                            submatrix[sub_i][sub_j] = matrix[row][col];
+                            sub_j++;
+                        }
+                    }
+                    sub_i++;
+                }
+            }
+            
+            double cofactor = determinant_3x3(submatrix);
+            if ((i + j) % 2 == 1) {
+                cofactor = -cofactor;
+            }
+            
+            // 転置して余因子行列を随伴行列にする
+            result[j][i] = cofactor / det;
+        }
+    }
+    
+    return 1;
+}
+
+// トレース（対角和）の計算
+double trace_matrix(Matrix4x4 matrix) {
+    double trace = 0;
+    for (int i = 0; i < SIZE; i++) {
+        trace += matrix[i][i];
+    }
+    return trace;
+}
+
+// 行列のコピー
+void copy_matrix(Matrix4x4 src, Matrix4x4 dest) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            dest[i][j] = src[i][j];
+        }
+    }
+}
+
+// 単位行列の作成
+void identity_matrix(Matrix4x4 matrix) {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            matrix[i][j] = (i == j) ? 1.0 : 0.0;
+        }
+    }
+}
+
+int main() {
+    printf("=== 4x4行列計算プログラム ===\n\n");
+    
+    // サンプル行列の初期化
+    Matrix4x4 matrix_a = {
+        {1, 2, 3, 4},
+        {5, 6, 7, 8},
+        {9, 10, 11, 12},
+        {13, 14, 15, 16}
+    };
+    
+    Matrix4x4 matrix_b = {
+        {2, 0, 1, 3},
+        {1, 1, 0, 2},
+        {0, 1, 2, 1},
+        {1, 0, 1, 1}
+    };
+    
+    Matrix4x4 result;
+    
+    // 行列の表示
+    print_matrix(matrix_a, "行列 A");
+    print_matrix(matrix_b, "行列 B");
+    
+    // 加算
+    add_matrices(matrix_a, matrix_b, result);
+    print_matrix(result, "A + B");
+    
+    // 減算
+    subtract_matrices(matrix_a, matrix_b, result);
+    print_matrix(result, "A - B");
+    
+    // 乗算
+    multiply_matrices(matrix_a, matrix_b, result);
+    print_matrix(result, "A × B");
+    
+    // スカラー倍
+    scalar_multiply(matrix_a, 2.0, result);
+    print_matrix(result, "A × 2");
+    
+    // 転置
+    transpose_matrix(matrix_a, result);
+    print_matrix(result, "A の転置");
+    
+    // 行列式
+    printf("A の行列式: %.2f\n", determinant_4x4(matrix_a));
+    printf("B の行列式: %.2f\n\n", determinant_4x4(matrix_b));
+    
+    // トレース
+    printf("A のトレース: %.2f\n", trace_matrix(matrix_a));
+    printf("B のトレース: %.2f\n\n", trace_matrix(matrix_b));
+    
+    // 逆行列（Bで試す）
+    if (inverse_matrix(matrix_b, result)) {
+        print_matrix(result, "B の逆行列");
         
-    except ValueError as e:
-        print(f"逆行列計算エラー: {e}")
-
-# 対話的な使用例
-def interactive_example():
-    print("\n=== 対話的な例 ===")
+        // 検証: B × B^(-1) = I
+        Matrix4x4 verification;
+        multiply_matrices(matrix_b, result, verification);
+        print_matrix(verification, "検証 B × B^(-1)（単位行列になるはず）");
+    }
     
-    # ユーザーが行列を入力できる関数
-    def input_matrix():
-        print("4x4行列を入力してください（行ごとに4つの数値をスペース区切りで入力）:")
-        matrix = []
-        for i in range(4):
-            row = list(map(float, input(f"行 {i+1}: ").split()))
-            if len(row) != 4:
-                raise ValueError("各行に4つの数値を入力してください")
-            matrix.append(row)
-        return Matrix4x4(matrix)
+    // 単位行列の例
+    Matrix4x4 identity;
+    identity_matrix(identity);
+    print_matrix(identity, "単位行列");
     
-    # 簡単な例として単位行列を作成
-    identity = Matrix4x4([
-        [1, 0, 0, 0],
-        [0, 1, 0, 0],
-        [0, 0, 1, 0],
-        [0, 0, 0, 1]
-    ])
-    
-    print("単位行列:")
-    print(identity)
-    
-    # ランダム行列の例
-    random_matrix = Matrix4x4(np.random.randint(1, 10, (4, 4)))
-    print("ランダム行列:")
-    print(random_matrix)
-
-if __name__ == "__main__":
-    main()
-    interactive_example()
+    return 0;
+}
