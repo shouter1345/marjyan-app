@@ -1,255 +1,282 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-#define SIZE 4
-
-// 4x4行列の型定義
-typedef double Matrix4x4[SIZE][SIZE];
-
-// 関数プロトタイプ
-void print_matrix(Matrix4x4 matrix, const char* name);
-void add_matrices(Matrix4x4 a, Matrix4x4 b, Matrix4x4 result);
-void subtract_matrices(Matrix4x4 a, Matrix4x4 b, Matrix4x4 result);
-void multiply_matrices(Matrix4x4 a, Matrix4x4 b, Matrix4x4 result);
-void scalar_multiply(Matrix4x4 matrix, double scalar, Matrix4x4 result);
-void transpose_matrix(Matrix4x4 matrix, Matrix4x4 result);
-double determinant_4x4(Matrix4x4 matrix);
-double determinant_3x3(double matrix[3][3]);
-int inverse_matrix(Matrix4x4 matrix, Matrix4x4 result);
-double trace_matrix(Matrix4x4 matrix);
-void copy_matrix(Matrix4x4 src, Matrix4x4 dest);
-void identity_matrix(Matrix4x4 matrix);
-
-// 行列を表示する関数
-void print_matrix(Matrix4x4 matrix, const char* name) {
-    printf("%s:\n", name);
-    for (int i = 0; i < SIZE; i++) {
-        printf("[ ");
-        for (int j = 0; j < SIZE; j++) {
-            printf("%8.2f ", matrix[i][j]);
-        }
-        printf("]\n");
-    }
-    printf("\n");
-}
-
-// 行列の加算
-void add_matrices(Matrix4x4 a, Matrix4x4 b, Matrix4x4 result) {
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-            result[i][j] = a[i][j] + b[i][j];
-        }
-    }
-}
-
-// 行列の減算
-void subtract_matrices(Matrix4x4 a, Matrix4x4 b, Matrix4x4 result) {
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-            result[i][j] = a[i][j] - b[i][j];
-        }
-    }
-}
-
-// 行列の乗算
-void multiply_matrices(Matrix4x4 a, Matrix4x4 b, Matrix4x4 result) {
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-            result[i][j] = 0;
-            for (int k = 0; k < SIZE; k++) {
-                result[i][j] += a[i][k] * b[k][j];
-            }
-        }
-    }
-}
-
-// スカラー倍
-void scalar_multiply(Matrix4x4 matrix, double scalar, Matrix4x4 result) {
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-            result[i][j] = matrix[i][j] * scalar;
-        }
-    }
-}
-
-// 転置行列
-void transpose_matrix(Matrix4x4 matrix, Matrix4x4 result) {
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-            result[j][i] = matrix[i][j];
-        }
-    }
-}
-
-// 3x3行列の行列式
-double determinant_3x3(double matrix[3][3]) {
-    return matrix[0][0] * (matrix[1][1] * matrix[2][2] - matrix[1][2] * matrix[2][1])
-         - matrix[0][1] * (matrix[1][0] * matrix[2][2] - matrix[1][2] * matrix[2][0])
-         + matrix[0][2] * (matrix[1][0] * matrix[2][1] - matrix[1][1] * matrix[2][0]);
-}
-
-// 4x4行列の行列式
-double determinant_4x4(Matrix4x4 matrix) {
-    double det = 0;
-    double submatrix[3][3];
-    int sign = 1;
-    
-    for (int col = 0; col < SIZE; col++) {
-        // 余因子行列を作成
-        int sub_i = 0;
-        for (int i = 1; i < SIZE; i++) {
-            int sub_j = 0;
-            for (int j = 0; j < SIZE; j++) {
-                if (j != col) {
-                    submatrix[sub_i][sub_j] = matrix[i][j];
-                    sub_j++;
-                }
-            }
-            sub_i++;
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4×4行列計算アプリ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
         }
         
-        det += sign * matrix[0][col] * determinant_3x3(submatrix);
-        sign = -sign;
-    }
-    
-    return det;
-}
-
-// 逆行列の計算
-int inverse_matrix(Matrix4x4 matrix, Matrix4x4 result) {
-    double det = determinant_4x4(matrix);
-    
-    if (fabs(det) < 1e-10) {
-        printf("エラー: 行列は特異行列です（逆行列が存在しません）\n");
-        return 0;
-    }
-    
-    // 余因子行列を計算
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-            double submatrix[3][3];
-            int sub_i = 0;
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .matrices-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        
+        .matrix {
+            margin: 20px;
+        }
+        
+        .matrix h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #555;
+        }
+        
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 60px);
+            gap: 5px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        
+        .matrix-input {
+            width: 50px;
+            height: 40px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .matrix-input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+        
+        .multiply-symbol {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            align-self: center;
+        }
+        
+        .equals-symbol {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            align-self: center;
+        }
+        
+        .calculate-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .calculate-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .result-matrix {
+            margin: 20px;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 80px);
+            gap: 5px;
+            padding: 15px;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            background-color: #f8fff9;
+        }
+        
+        .result-cell {
+            width: 70px;
+            height: 40px;
+            text-align: center;
+            border: 1px solid #28a745;
+            border-radius: 4px;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .clear-btn {
+            display: block;
+            margin: 10px auto;
+            padding: 8px 20px;
+            font-size: 14px;
+            color: #dc3545;
+            background-color: white;
+            border: 1px solid #dc3545;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .clear-btn:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>4×4行列計算アプリ</h1>
+        
+        <div class="matrices-container">
+            <!-- 行列A -->
+            <div class="matrix">
+                <h3>行列 A</h3>
+                <div class="matrix-grid" id="matrixA">
+                    <!-- 4×4のinput要素が動的に生成されます -->
+                </div>
+            </div>
             
-            for (int row = 0; row < SIZE; row++) {
-                if (row != i) {
-                    int sub_j = 0;
-                    for (int col = 0; col < SIZE; col++) {
-                        if (col != j) {
-                            submatrix[sub_i][sub_j] = matrix[row][col];
-                            sub_j++;
-                        }
+            <div class="multiply-symbol">×</div>
+            
+            <!-- 行列B -->
+            <div class="matrix">
+                <h3>行列 B</h3>
+                <div class="matrix-grid" id="matrixB">
+                    <!-- 4×4のinput要素が動的に生成されます -->
+                </div>
+            </div>
+            
+            <div class="equals-symbol">=</div>
+            
+            <!-- 結果行列 -->
+            <div class="result-matrix">
+                <h3>結果 (A × B)</h3>
+                <div class="result-grid" id="resultMatrix">
+                    <!-- 結果が表示されます -->
+                </div>
+            </div>
+        </div>
+        
+        <button class="calculate-btn" onclick="calculateMatrix()">計算実行</button>
+        <button class="clear-btn" onclick="clearAll()">クリア</button>
+    </div>
+
+    <script>
+        // ページ読み込み時に入力フィールドを初期化
+        window.onload = function() {
+            initializeMatrices();
+        };
+        
+        function initializeMatrices() {
+            // 行列Aの入力フィールドを作成
+            const matrixA = document.getElementById('matrixA');
+            matrixA.innerHTML = '';
+            for (let i = 0; i < 16; i++) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.step = 'any';
+                input.className = 'matrix-input';
+                input.id = `a${i}`;
+                input.value = '0';
+                matrixA.appendChild(input);
+            }
+            
+            // 行列Bの入力フィールドを作成
+            const matrixB = document.getElementById('matrixB');
+            matrixB.innerHTML = '';
+            for (let i = 0; i < 16; i++) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.step = 'any';
+                input.className = 'matrix-input';
+                input.id = `b${i}`;
+                input.value = '0';
+                matrixB.appendChild(input);
+            }
+            
+            // 結果表示エリアを初期化
+            const resultMatrix = document.getElementById('resultMatrix');
+            resultMatrix.innerHTML = '';
+            for (let i = 0; i < 16; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'result-cell';
+                cell.id = `result${i}`;
+                cell.textContent = '0';
+                resultMatrix.appendChild(cell);
+            }
+        }
+        
+        function calculateMatrix() {
+            // 入力値を取得
+            const matrixA = [];
+            const matrixB = [];
+            
+            // 4×4行列として配列に格納
+            for (let i = 0; i < 4; i++) {
+                matrixA[i] = [];
+                matrixB[i] = [];
+                for (let j = 0; j < 4; j++) {
+                    const indexA = i * 4 + j;
+                    const indexB = i * 4 + j;
+                    matrixA[i][j] = parseFloat(document.getElementById(`a${indexA}`).value) || 0;
+                    matrixB[i][j] = parseFloat(document.getElementById(`b${indexB}`).value) || 0;
+                }
+            }
+            
+            // 行列の掛け算を実行
+            const result = [];
+            for (let i = 0; i < 4; i++) {
+                result[i] = [];
+                for (let j = 0; j < 4; j++) {
+                    result[i][j] = 0;
+                    for (let k = 0; k < 4; k++) {
+                        result[i][j] += matrixA[i][k] * matrixB[k][j];
                     }
-                    sub_i++;
                 }
             }
             
-            double cofactor = determinant_3x3(submatrix);
-            if ((i + j) % 2 == 1) {
-                cofactor = -cofactor;
+            // 結果を表示
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    const index = i * 4 + j;
+                    const resultCell = document.getElementById(`result${index}`);
+                    resultCell.textContent = result[i][j].toFixed(2);
+                }
             }
-            
-            // 転置して余因子行列を随伴行列にする
-            result[j][i] = cofactor / det;
         }
-    }
-    
-    return 1;
-}
-
-// トレース（対角和）の計算
-double trace_matrix(Matrix4x4 matrix) {
-    double trace = 0;
-    for (int i = 0; i < SIZE; i++) {
-        trace += matrix[i][i];
-    }
-    return trace;
-}
-
-// 行列のコピー
-void copy_matrix(Matrix4x4 src, Matrix4x4 dest) {
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-            dest[i][j] = src[i][j];
-        }
-    }
-}
-
-// 単位行列の作成
-void identity_matrix(Matrix4x4 matrix) {
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-            matrix[i][j] = (i == j) ? 1.0 : 0.0;
-        }
-    }
-}
-
-int main() {
-    printf("=== 4x4行列計算プログラム ===\n\n");
-    
-    // サンプル行列の初期化
-    Matrix4x4 matrix_a = {
-        {1, 2, 3, 4},
-        {5, 6, 7, 8},
-        {9, 10, 11, 12},
-        {13, 14, 15, 16}
-    };
-    
-    Matrix4x4 matrix_b = {
-        {2, 0, 1, 3},
-        {1, 1, 0, 2},
-        {0, 1, 2, 1},
-        {1, 0, 1, 1}
-    };
-    
-    Matrix4x4 result;
-    
-    // 行列の表示
-    print_matrix(matrix_a, "行列 A");
-    print_matrix(matrix_b, "行列 B");
-    
-    // 加算
-    add_matrices(matrix_a, matrix_b, result);
-    print_matrix(result, "A + B");
-    
-    // 減算
-    subtract_matrices(matrix_a, matrix_b, result);
-    print_matrix(result, "A - B");
-    
-    // 乗算
-    multiply_matrices(matrix_a, matrix_b, result);
-    print_matrix(result, "A × B");
-    
-    // スカラー倍
-    scalar_multiply(matrix_a, 2.0, result);
-    print_matrix(result, "A × 2");
-    
-    // 転置
-    transpose_matrix(matrix_a, result);
-    print_matrix(result, "A の転置");
-    
-    // 行列式
-    printf("A の行列式: %.2f\n", determinant_4x4(matrix_a));
-    printf("B の行列式: %.2f\n\n", determinant_4x4(matrix_b));
-    
-    // トレース
-    printf("A のトレース: %.2f\n", trace_matrix(matrix_a));
-    printf("B のトレース: %.2f\n\n", trace_matrix(matrix_b));
-    
-    // 逆行列（Bで試す）
-    if (inverse_matrix(matrix_b, result)) {
-        print_matrix(result, "B の逆行列");
         
-        // 検証: B × B^(-1) = I
-        Matrix4x4 verification;
-        multiply_matrices(matrix_b, result, verification);
-        print_matrix(verification, "検証 B × B^(-1)（単位行列になるはず）");
-    }
-    
-    // 単位行列の例
-    Matrix4x4 identity;
-    identity_matrix(identity);
-    print_matrix(identity, "単位行列");
-    
-    return 0;
-}
+        function clearAll() {
+            // すべての入力をクリア
+            for (let i = 0; i < 16; i++) {
+                document.getElementById(`a${i}`).value = '0';
+                document.getElementById(`b${i}`).value = '0';
+                document.getElementById(`result${i}`).textContent = '0';
+            }
+        }
+    </script>
+</body>
+</html>
