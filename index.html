@@ -1690,7 +1690,7 @@ label {
     const fourCount = results.filter(result => result[player] === 4).length;
     
     // 素ポイントと順位ポイントの計算
-    const rawPoints = pointsHistory.map(points => (points[player] - 30000) /1000);
+    const rawPoints = pointsHistory.map(points => (points[player] - 30));
     const totalRawPoints = rawPoints.reduce((a, b) => a + b, 0);
     const rankPoints = results.map(result => calculateRankPoints(result[player]));
     const totalRankPoints = rankPoints.reduce((a, b) => a + b, 0);
